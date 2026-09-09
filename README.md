@@ -312,6 +312,39 @@ In case you need to retrieve the preference by ID:
     $client->get("123456789");
 ```
 
+### Checkout Pro vía Orders API
+
+Una order es el recurso central para gestionar el ciclo de vida del pago. Créala mediante un `POST` al endpoint `/v1/orders`, incluyendo el `Authorization` con tu access token y un `X-Idempotency-Key` único por intento para evitar duplicados. Los campos esenciales son `type`, `processing_mode`, `total_amount`, `payer` e `items`.
+
+```bash
+curl -X POST \\
+    -H 'accept: application/json' \\
+    -H 'Content-Type: application/json' \\
+    -H 'Authorization: Bearer <ACCESS_TOKEN>' \\
+    -H 'X-Idempotency-Key: <UNIQUE_KEY>' \\
+    'https://api.mercadopago.com/v1/orders' \\
+    -d '{
+  "type": "online",
+  "processing_mode": "manual",
+  "total_amount": "1000.00",
+  "external_reference": "order_pro_123",
+  "payer": {
+    "email": "buyer@email.com"
+  },
+  "items": [
+    {
+      "title": "Mi producto",
+      "unit_price": "1000.00",
+      "quantity": 1,
+      "unit_measure": "unit",
+      "total_amount": "1000.00"
+    }
+  ]
+}'
+```
+
+La respuesta incluye el `id` de la order y `checkout_url`. Redirige al comprador a `checkout_url` para que complete el pago en Mercado Pago y conserva el `id` para consultar el estado o gestionar la order posteriormente, por ejemplo, para cancelaciones o reembolsos.
+
 ## 📚 Documentation
 
 See our documentation for more details.
