@@ -217,36 +217,40 @@ protected function authenticate()
 }
 ```
 
-### Step 3: Create customer's preference before proceeding to Checkout Pro page
+### Step 2: Create an order for Checkout Pro
+
+For Checkout Pro, set `type` to `online` and `processing_mode` to `manual`. Include the payer and the items being purchased in the request. The request is sent to the Orders API endpoint (`POST /v1/orders`).
 
 ```php
-// Function that will return a request object to be sent to Mercado Pago API
-function createPreferenceRequest($items, $payer): array
-{
-    $paymentMethods = [
-        "excluded_payment_methods" => [],
-        "installments" => 12,
-        "default_installments" => 1
-    ];
+$client = new OrderClient();
 
-    $backUrls = array(
-        'success' => route('mercadopago.success'),
-        'failure' => route('mercadopago.failed')
-    );
+$request = [
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "1000.00",
+    "external_reference" => "order_pro_123",
+    "payer" => ["email" => "<PAYER_EMAIL>"],
+    "items" => [[
+        "title" => "My product",
+        "unit_price" => "1000.00",
+        "quantity" => 1,
+        "unit_measure" => "unit",
+    ]]
+];
 
-    $request = [
-        "items" => $items,
-        "payer" => $payer,
-        "payment_methods" => $paymentMethods,
-        "back_urls" => $backUrls,
-        "statement_descriptor" => "NAME_DISPLAYED_IN_USER_BILLING",
-        "external_reference" => "1234567890",
-        "expires" => false,
-        "auto_return" => 'approved',
-    ];
+$request_options = new RequestOptions();
+$request_options->setCustomHeaders(["X-Idempotency-Key: <UNIQUE_KEY>"]);
 
-    return $request;
-}
+$order = $client->create($request, $request_options);
+```
+
+### Step 3: Redirect the buyer to Checkout Pro
+
+The response includes `checkout_url`. Redirect the buyer to this URL to complete the payment, and keep the order `id` for future operations.
+
+```php
+header("Location: " . $order->checkout_url);
+exit;
 ```
 
 ### Step 4: Create the preference on Mercado Pago ([DOCS](https://www.mercadopago.com.br/developers/pt/docs/sdks-library/server-side/php/preferences))
