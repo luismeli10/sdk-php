@@ -194,6 +194,8 @@ try{
 
 ## 🌟 Getting started with payment via Checkout Pro
 
+Use Preferences to configure the Checkout Pro experience and redirect the buyer to the preference `init_point`.
+
 ### Step 1: Require the libraries
 
 ```php
@@ -310,6 +312,42 @@ In case you need to retrieve the preference by ID:
 ```php
     $client = new PreferenceClient();
     $client->get("123456789");
+```
+
+### Checkout Pro via Orders API
+
+You can also create a Checkout Pro order with the Orders API. Use `processing_mode` set to `manual` and a unique `X-Idempotency-Key` for each attempt. The response includes `checkout_url`, where you must redirect the buyer.
+
+```php
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
+use MercadoPago\MercadoPagoConfig;
+
+MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
+
+$client = new OrderClient();
+$requestOptions = new RequestOptions();
+$requestOptions->setCustomHeaders(["X-Idempotency-Key: <UNIQUE_UUID>"]);
+
+$order = $client->create([
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "100.00",
+    "external_reference" => "order_pro_123",
+    "payer" => [
+        "email" => "buyer@example.com",
+    ],
+    "items" => [
+        [
+            "title" => "My product",
+            "quantity" => 1,
+            "unit_price" => "100.00",
+        ],
+    ],
+], $requestOptions);
+
+header("Location: " . $order->checkout_url);
+exit;
 ```
 
 ## 📚 Documentation
