@@ -295,7 +295,7 @@ public function createPaymentPreference(): ?Preference
         // Send the request that will create the new preference for user's checkout flow
         $preference = $client->create($request);
 
-        // Useful props you could use from this object is 'init_point' (URL to Checkout Pro) or the 'id'
+        // Redirect the buyer to $preference->init_point to complete the payment.
         return $preference;
     } catch (MPApiException $error) {
         // Here you might return whatever your app needs.
