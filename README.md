@@ -38,7 +38,7 @@ That's it! Mercado Pago SDK has been successfully installed.
 
 Here you can check eg. data structures for each parameter used by the SDK for each class.
 
-## 🌟 Getting Started with payment via your own website forms
+## 🌟 Getting Started with Checkout Pro
 
 Simple usage looks like:
 
