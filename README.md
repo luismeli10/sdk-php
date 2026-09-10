@@ -194,122 +194,152 @@ try{
 
 ## 🌟 Getting started with payment via Checkout Pro
 
+Checkout Pro integration using the **Orders API**. Create an order with `processing_mode` set to `"manual"` to obtain a `checkout_url` for redirecting the buyer to MercadoPago's hosted payment flow.
+
 ### Step 1: Require the libraries
 
 ```php
-use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Client\Preference\PreferenceClient;
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
+use MercadoPago\MercadoPagoConfig;
 ```
 
-### Step 2: Create an authentication function
+### Step 2: Set up authentication
 
 ```php
-protected function authenticate()
-{
-    // Getting the access token from .env file (create your own function)
-    $mpAccessToken = getVariableFromEnv('mercado_pago_access_token');
-    // Set the token the SDK's config
-    MercadoPagoConfig::setAccessToken($mpAccessToken);
-    // (Optional) Set the runtime enviroment to LOCAL if you want to test on localhost
-    // Default value is set to SERVER
-    MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
-}
+// Getting the access token from your .env file (create your own function)
+$mpAccessToken = getVariableFromEnv('mercado_pago_access_token');
+// Set the token in the SDK's config
+MercadoPagoConfig::setAccessToken($mpAccessToken);
+// (Optional) Set the runtime environment to LOCAL for localhost testing
+// Default value is SERVER
+MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
 ```
 
-### Step 3: Create customer's preference before proceeding to Checkout Pro page
+### Step 3: Build the Checkout Pro order request
 
 ```php
-// Function that will return a request object to be sent to Mercado Pago API
-function createPreferenceRequest($items, $payer): array
+// Function that returns the request payload for a Checkout Pro order
+function createCheckoutProRequest(array $items, array $payer): array
 {
-    $paymentMethods = [
-        "excluded_payment_methods" => [],
-        "installments" => 12,
-        "default_installments" => 1
-    ];
-
-    $backUrls = array(
-        'success' => route('mercadopago.success'),
-        'failure' => route('mercadopago.failed')
-    );
-
-    $request = [
-        "items" => $items,
+    return [
+        "type" => "online",
+        "processing_mode" => "manual",
+        "total_amount" => "500.00",
+        "external_reference" => "order_pro_123",
+        "capture_mode" => "automatic",
+        "description" => "Order with multiple items",
+        "expiration_time" => "P1D",
         "payer" => $payer,
-        "payment_methods" => $paymentMethods,
-        "back_urls" => $backUrls,
-        "statement_descriptor" => "NAME_DISPLAYED_IN_USER_BILLING",
-        "external_reference" => "1234567890",
-        "expires" => false,
-        "auto_return" => 'approved',
+        "items" => $items,
+        "config" => [
+            "statement_descriptor" => "MYSTORE",
+            "online" => [
+                "success_url" => "https://example.com/success",
+                "failure_url" => "https://example.com/failure",
+                "pending_url" => "https://example.com/pending",
+                "auto_return" => "approved",
+            ],
+            "payment_method" => [
+                "max_installments" => 12,
+                "not_allowed_ids" => ["amex"],
+                "not_allowed_types" => ["ticket"],
+            ],
+        ],
     ];
-
-    return $request;
 }
 ```
 
-### Step 4: Create the preference on Mercado Pago ([DOCS](https://www.mercadopago.com.br/developers/pt/docs/sdks-library/server-side/php/preferences))
+### Step 4: Create the order and redirect the buyer
 
 ```php
-public function createPaymentPreference(): ?Preference
-{
-    // Fill the data about the product(s) being purchased
-    $product1 = array(
-        "id" => "1234567890",
-        "title" => "Product 1 Title",
-        "description" => "Product 1 Description",
-        "currency_id" => "BRL",
-        "quantity" => 12,
-        "unit_price" => 9.90
-    );
+// Fill the data about the product(s) being purchased
+$product1 = [
+    "external_code" => "ITEM-001",
+    "title" => "Product 1 Title",
+    "description" => "Product 1 Description",
+    "category_id" => "electronics",
+    "picture_url" => "https://example.com/img1.jpg",
+    "quantity" => 1,
+    "unit_price" => "450.00",
+    "type" => "physical",
+];
 
-    $product2 = array(
-        "id" => "9012345678",
-        "title" => "Product 2 Title",
-        "description" => "Product 2 Description",
-        "currency_id" => "BRL",
-        "quantity" => 5,
-        "unit_price" => 19.90
-    );
+$product2 = [
+    "external_code" => "ITEM-002",
+    "title" => "Product 2 Title",
+    "description" => "Product 2 Description",
+    "category_id" => "electronics",
+    "picture_url" => "https://example.com/img2.jpg",
+    "quantity" => 1,
+    "unit_price" => "50.00",
+    "type" => "physical",
+];
 
-    // Mount the array of products that will integrate the purchase amount
-    $items = array($product1, $product2);
+$items = [$product1, $product2];
 
-    // Retrieve information about the user (use your own function)
-    $user = getSessionUser();
+// Retrieve buyer information (use your own function)
+$user = getSessionUser();
 
-    $payer = array(
-        "name" => $user->name,
-        "surname" => $user->surname,
-        "email" => $user->email,
-    );
+$payer = [
+    "email" => $user->email,
+    "first_name" => $user->name,
+    "last_name" => $user->surname,
+    "phone" => [
+        "area_code" => "11",
+        "number" => "999998888",
+    ],
+    "identification" => [
+        "type" => "CPF",
+        "number" => "12345678909",
+    ],
+    "address" => [
+        "zip_code" => "01310-100",
+        "street_name" => "Av. Paulista",
+        "street_number" => "1000",
+        "neighborhood" => "Bela Vista",
+        "city" => "São Paulo",
+    ],
+];
 
-    // Create the request object to be sent to the API when the preference is created
-    $request = createPreferenceRequest($item, $payer);
+$request = createCheckoutProRequest($items, $payer);
 
-    // Instantiate a new Preference Client
-    $client = new PreferenceClient();
+// Instantiate the Orders API client
+$client = new OrderClient();
 
-    try {
-        // Send the request that will create the new preference for user's checkout flow
-        $preference = $client->create($request);
+// Set X-Idempotency-Key to prevent duplicate orders on retries
+$request_options = new RequestOptions();
+$request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-        // Useful props you could use from this object is 'init_point' (URL to Checkout Pro) or the 'id'
-        return $preference;
-    } catch (MPApiException $error) {
-        // Here you might return whatever your app needs.
-        // We are returning null here as an example.
-        return null;
-    }
+try {
+    // Create the order — the API returns the order id and the checkout_url
+    $order = $client->create($request, $request_options);
+
+    // Save the order id for future operations (cancel, refund, get status)
+    echo "Order ID: " . $order->id . "\n";
+    echo "Order status: " . $order->status . "\n";
+
+    // Redirect the buyer to the Checkout Pro payment flow
+    echo "Checkout URL: " . $order->checkout_url . "\n";
+    // Redirect your buyer to $order->checkout_url to complete the payment
+
+} catch (MPApiException $e) {
+    echo "Status code: " . $e->getApiResponse()->getStatusCode() . "\n";
+    echo "Content: ";
+    var_dump($e->getApiResponse()->getContent());
+    echo "\n";
+} catch (\Exception $e) {
+    echo $e->getMessage();
 }
 ```
 
-In case you need to retrieve the preference by ID:
+In case you need to retrieve the order by ID:
 
 ```php
-    $client = new PreferenceClient();
-    $client->get("123456789");
+    $client = new OrderClient();
+    $order = $client->get("<ORDER_ID>");
+    echo "Status: " . $order->status . "\n";
 ```
 
 ## 📚 Documentation
