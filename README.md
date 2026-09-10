@@ -312,6 +312,47 @@ In case you need to retrieve the preference by ID:
     $client->get("123456789");
 ```
 
+### Checkout Pro via Orders API
+
+Create one order for each payment attempt. Include a unique UUID in the `X-Idempotency-Key` header for every creation attempt to prevent duplicate orders.
+
+```php
+<?php
+
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
+use MercadoPago\MercadoPagoConfig;
+
+MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
+
+$orderClient = new OrderClient();
+$createOrderRequest = [
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "1000.00",
+    "external_reference" => "order_pro_123",
+    "payer" => [
+        "email" => "<PAYER_EMAIL>",
+    ],
+    "items" => [
+        [
+            "title" => "Product title",
+            "unit_price" => "500.00",
+            "quantity" => 2,
+        ],
+    ],
+];
+
+$requestOptions = new RequestOptions();
+$requestOptions->setCustomHeaders([
+    "X-Idempotency-Key" => "<UNIQUE_UUID_FOR_THIS_CREATION_ATTEMPT>",
+]);
+
+$order = $orderClient->create($createOrderRequest, $requestOptions);
+header("Location: " . $order->checkout_url);
+exit;
+```
+
 ## 📚 Documentation
 
 See our documentation for more details.
