@@ -194,27 +194,15 @@ try{
 
 ## 🌟 Getting started with payment via Checkout Pro
 
+Create an order with the Orders API and redirect the buyer to the returned `checkout_url`.
+
 ### Step 1: Require the libraries
 
 ```php
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Client\Preference\PreferenceClient;
-use MercadoPago\Exceptions\MPApiException;
-```
-
-### Step 2: Create an authentication function
-
-```php
-protected function authenticate()
-{
-    // Getting the access token from .env file (create your own function)
-    $mpAccessToken = getVariableFromEnv('mercado_pago_access_token');
-    // Set the token the SDK's config
-    MercadoPagoConfig::setAccessToken($mpAccessToken);
-    // (Optional) Set the runtime enviroment to LOCAL if you want to test on localhost
-    // Default value is set to SERVER
-    MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
-}
+use MercadoPago\Resources\Order;
 ```
 
 ### Step 3: Create customer's preference before proceeding to Checkout Pro page
@@ -310,6 +298,42 @@ In case you need to retrieve the preference by ID:
 ```php
     $client = new PreferenceClient();
     $client->get("123456789");
+```
+
+### Checkout Pro via Orders API
+
+You can also create a Checkout Pro order with the Orders API. Use `processing_mode` set to `manual` and a unique `X-Idempotency-Key` for each attempt. The response includes `checkout_url`, where you must redirect the buyer.
+
+```php
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
+use MercadoPago\MercadoPagoConfig;
+
+MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
+
+$client = new OrderClient();
+$requestOptions = new RequestOptions();
+$requestOptions->setCustomHeaders(["X-Idempotency-Key: <UNIQUE_UUID>"]);
+
+$order = $client->create([
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "100.00",
+    "external_reference" => "order_pro_123",
+    "payer" => [
+        "email" => "buyer@example.com",
+    ],
+    "items" => [
+        [
+            "title" => "My product",
+            "quantity" => 1,
+            "unit_price" => "100.00",
+        ],
+    ],
+], $requestOptions);
+
+header("Location: " . $order->checkout_url);
+exit;
 ```
 
 ## 📚 Documentation
