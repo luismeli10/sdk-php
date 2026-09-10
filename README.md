@@ -194,28 +194,19 @@ try{
 
 ## 🌟 Getting started with payment via Checkout Pro
 
-### Step 1: Require the libraries
+Checkout Pro supports both the Preferences API and the Orders API. Choose the flow that matches your integration.
+
+### Checkout Pro via Preferences API
 
 ```php
-use MercadoPago\MercadoPagoConfig;
+<?php
+
+require_once 'vendor/autoload.php';
+
 use MercadoPago\Client\Preference\PreferenceClient;
-use MercadoPago\Exceptions\MPApiException;
-```
+use MercadoPago\MercadoPagoConfig;
 
-### Step 2: Create an authentication function
-
-```php
-protected function authenticate()
-{
-    // Getting the access token from .env file (create your own function)
-    $mpAccessToken = getVariableFromEnv('mercado_pago_access_token');
-    // Set the token the SDK's config
-    MercadoPagoConfig::setAccessToken($mpAccessToken);
-    // (Optional) Set the runtime enviroment to LOCAL if you want to test on localhost
-    // Default value is set to SERVER
-    MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
-}
-```
+MercadoPagoConfig::setAccessToken('<ACCESS_TOKEN>');
 
 ### Step 3: Create customer's preference before proceeding to Checkout Pro page
 
