@@ -192,7 +192,7 @@ try{
 }
 ```
 
-## 🌟 Getting started with payment via Checkout Pro
+## 🌟 Getting started with payment via Checkout Pro (Preferences API)
 
 ### Step 1: Require the libraries
 
@@ -310,6 +310,47 @@ In case you need to retrieve the preference by ID:
 ```php
     $client = new PreferenceClient();
     $client->get("123456789");
+```
+
+## 🌟 Getting started with payment via Checkout Pro (Orders API)
+
+Create an online order with manual processing to receive a `checkout_url` for redirecting the buyer. Include a unique `X-Idempotency-Key` for every order-creation attempt.
+
+```php
+<?php
+require_once 'vendor/autoload.php';
+
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
+use MercadoPago\MercadoPagoConfig;
+
+MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
+
+$client = new OrderClient();
+$request = [
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "1000.00",
+    "payer" => [
+        "email" => "<PAYER_EMAIL>",
+    ],
+    "items" => [
+        [
+            "title" => "Product title",
+            "quantity" => 1,
+            "unit_price" => "1000.00",
+        ],
+    ],
+];
+
+// Use RequestOptions to send a unique idempotency key for each creation attempt.
+$requestOptions = new RequestOptions();
+$requestOptions->setCustomHeaders(["X-Idempotency-Key: <UNIQUE_KEY>"]);
+
+$order = $client->create($request, $requestOptions);
+
+// Redirect the buyer to this URL to complete the payment.
+$checkoutUrl = $order->checkout_url;
 ```
 
 ## 📚 Documentation
