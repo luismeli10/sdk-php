@@ -1,0 +1,20 @@
+{
+  "id": "01JQRCONFIRM000000000000001",
+  "type": "in_store",
+  "processing_mode": "automatic",
+  "capture_mode": "automatic",
+  "external_reference": "confirm_ref_1234",
+  "total_amount": "100.00",
+  "status": "processed",
+  "status_detail": "accredited",
+  "transactions": {
+    "payments": [
+      {
+        "id": "pay_01JQRCONFIRM0000000000001",
+        "amount": "100.00",
+        "status": "processed",
+        "status_detail": "accredited"
+      }
+    ]
+  }
+}

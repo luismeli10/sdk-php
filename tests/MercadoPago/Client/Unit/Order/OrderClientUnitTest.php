@@ -4,7 +4,6 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
@@ -694,6 +693,113 @@ final class OrderClientUnitTest extends BaseClient
                 ["external_code" => "ITEM-002", "title" => "Travel insurance", "quantity" => 1, "unit_price" => "50.00"]
             ]
         ];
+    }
+
+    public function testConfirmSendsRequestAndMapsOrder(): void
+    {
+        $captured_options = [];
+        $mock_http_request = $this->getMockBuilder(\MercadoPago\Net\HttpRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock_http_request->expects($this->once())
+            ->method('setOptionArray')
+            ->with($this->callback(function (array $options) use (&$captured_options): bool {
+                $captured_options = $options;
+                return true;
+            }));
+        $mock_http_request->method('execute')->willReturn(file_get_contents(
+            __DIR__ . '/../../../../Resources/Mocks/Response/Order/order_confirm.json'
+        ));
+        $mock_http_request->method('getInfo')->willReturnCallback(
+            fn ($option) => $option === CURLINFO_HTTP_CODE ? 200 : null
+        );
+        $mock_http_request->method('close');
+        MercadoPagoConfig::setHttpClient(new MPDefaultHttpClient($mock_http_request));
+
+        $request = [
+            'transactions' => [
+                ['id' => 'pay_01JQRCONFIRM0000000000001', 'amount' => '100.00'],
+            ],
+        ];
+        $request_options = new RequestOptions();
+        $request_options->setCustomHeaders(['X-Idempotency-Key: confirm-key']);
+
+        $order = (new OrderClient())->confirm('order/id', $request, $request_options);
+
+        $this->assertSame('/v1/orders/order%2Fid/confirm', parse_url($captured_options[CURLOPT_URL], PHP_URL_PATH));
+        $this->assertSame('POST', $captured_options[CURLOPT_CUSTOMREQUEST]);
+        $this->assertSame($request, json_decode($captured_options[CURLOPT_POSTFIELDS], true));
+        $this->assertContains('X-Idempotency-Key: confirm-key', $captured_options[CURLOPT_HTTPHEADER]);
+        $this->assertContains('X-Product-Id: ' . MercadoPagoConfig::$PRODUCT_ID, $captured_options[CURLOPT_HTTPHEADER]);
+        $this->assertSame('01JQRCONFIRM000000000000001', $order->id);
+        $this->assertSame('processed', $order->status);
+        $this->assertSame('pay_01JQRCONFIRM0000000000001', $order->transactions->payments[0]->id);
+    }
+
+    public function testSimulateEventSendsRequestAndReturnsEmptyResponse(): void
+    {
+        $captured_options = [];
+        $mock_http_request = $this->getMockBuilder(\MercadoPago\Net\HttpRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock_http_request->expects($this->once())
+            ->method('setOptionArray')
+            ->with($this->callback(function (array $options) use (&$captured_options): bool {
+                $captured_options = $options;
+                return true;
+            }));
+        $mock_http_request->method('execute')->willReturn('');
+        $mock_http_request->method('getInfo')->willReturnCallback(
+            fn ($option) => $option === CURLINFO_HTTP_CODE ? 204 : null
+        );
+        $mock_http_request->method('close');
+        MercadoPagoConfig::setHttpClient(new MPDefaultHttpClient($mock_http_request));
+
+        $request = ['type' => 'payment_processed'];
+        $request_options = new RequestOptions();
+        $request_options->setCustomHeaders(['X-Test-Header: event']);
+        $response = (new OrderClient())->simulateEvent('order/id', $request, $request_options);
+
+        $this->assertSame('/v1/orders/order%2Fid/events', parse_url($captured_options[CURLOPT_URL], PHP_URL_PATH));
+        $this->assertSame('POST', $captured_options[CURLOPT_CUSTOMREQUEST]);
+        $this->assertSame($request, json_decode($captured_options[CURLOPT_POSTFIELDS], true));
+        $this->assertContains('X-Test-Header: event', $captured_options[CURLOPT_HTTPHEADER]);
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertEmpty($response->getContent());
+    }
+
+    public function testGetRefundsSendsRequestAndMapsRefunds(): void
+    {
+        $captured_options = [];
+        $mock_http_request = $this->getMockBuilder(\MercadoPago\Net\HttpRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock_http_request->expects($this->once())
+            ->method('setOptionArray')
+            ->with($this->callback(function (array $options) use (&$captured_options): bool {
+                $captured_options = $options;
+                return true;
+            }));
+        $mock_http_request->method('execute')->willReturn(file_get_contents(
+            __DIR__ . '/../../../../Resources/Mocks/Response/Order/order_refund_list.json'
+        ));
+        $mock_http_request->method('getInfo')->willReturnCallback(
+            fn ($option) => $option === CURLINFO_HTTP_CODE ? 200 : null
+        );
+        $mock_http_request->method('close');
+        MercadoPagoConfig::setHttpClient(new MPDefaultHttpClient($mock_http_request));
+
+        $request_options = new RequestOptions();
+        $request_options->setCustomHeaders(['X-Idempotency-Key: refunds-key']);
+        $refunds = (new OrderClient())->getRefunds('order/id', $request_options);
+
+        $this->assertSame('/v1/orders/order%2Fid/refund', parse_url($captured_options[CURLOPT_URL], PHP_URL_PATH));
+        $this->assertSame('GET', $captured_options[CURLOPT_CUSTOMREQUEST]);
+        $this->assertContains('X-Idempotency-Key: refunds-key', $captured_options[CURLOPT_HTTPHEADER]);
+        $this->assertCount(2, $refunds);
+        $this->assertInstanceOf(\MercadoPago\Resources\Order\Refund::class, $refunds[0]);
+        $this->assertSame('ref_01JQRREFUND00000000000001', $refunds[0]->id);
+        $this->assertSame('25.00', $refunds[0]->amount);
     }
 
     public function testSearchSuccess(): void

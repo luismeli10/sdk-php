@@ -9,6 +9,7 @@ use MercadoPago\Resources\OrderSearch;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPHttpClient;
+use MercadoPago\Net\MPResponse;
 use MercadoPago\Net\MPSearchRequest;
 use MercadoPago\Serialization\Serializer;
 
@@ -29,6 +30,8 @@ final class OrderClient extends MercadoPagoClient
     private const URL_CAPTURE = self::URL_WITH_ID . '/capture';
     private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
     private const URL_PROCESS = self::URL_WITH_ID . '/process';
+    private const URL_CONFIRM = self::URL_WITH_ID . '/confirm';
+    private const URL_EVENTS = self::URL_WITH_ID . '/events';
     private const URL_REFUND = self::URL_WITH_ID . '/refund';
 
     /** @param MPHttpClient|null $MPHttpClient Custom HTTP client. Defaults to the SDK global client. */
@@ -134,6 +137,60 @@ final class OrderClient extends MercadoPagoClient
         $result = Serializer::deserializeFromJson(Order::class, $response->getContent());
         $result->setResponse($response);
         return $result;
+    }
+
+    /**
+     * Confirms the final transaction amounts for an in-store QR order.
+     *
+     * @param string $order_id Unique identifier of the order to confirm.
+     * @param array<string,mixed> $request Confirmation data.
+     * @param RequestOptions|null $request_options Per-request configuration overrides.
+     * @return Order The confirmed order resource.
+     * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
+     * @throws \Exception On transport-level errors.
+     */
+    public function confirm(string $order_id, array $request, ?RequestOptions $request_options = null): Order
+    {
+        $path = sprintf(self::URL_CONFIRM, rawurlencode($order_id));
+        $response = parent::send($path, HttpMethod::POST, json_encode($request), null, $request_options);
+        $result = Serializer::deserializeFromJson(Order::class, $response->getContent());
+        $result->setResponse($response);
+        return $result;
+    }
+
+    /**
+     * Simulates an event on an in-store order.
+     *
+     * @param string $order_id Unique identifier of the order.
+     * @param array<string,mixed> $request Event data.
+     * @param RequestOptions|null $request_options Per-request configuration overrides.
+     * @return MPResponse Raw API response (empty body with 204 status on success).
+     * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
+     * @throws \Exception On transport-level errors.
+     */
+    public function simulateEvent(string $order_id, array $request, ?RequestOptions $request_options = null): MPResponse
+    {
+        $path = sprintf(self::URL_EVENTS, rawurlencode($order_id));
+        return parent::send($path, HttpMethod::POST, json_encode($request), null, $request_options);
+    }
+
+    /**
+     * Lists refunds associated with an order.
+     *
+     * @param string $order_id Unique identifier of the order.
+     * @param RequestOptions|null $request_options Per-request configuration overrides.
+     * @return array<int,\MercadoPago\Resources\Order\Refund> Order refunds.
+     * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
+     * @throws \Exception On transport-level errors.
+     */
+    public function getRefunds(string $order_id, ?RequestOptions $request_options = null): array
+    {
+        $path = sprintf(self::URL_REFUND, rawurlencode($order_id));
+        $response = parent::send($path, HttpMethod::GET, null, null, $request_options);
+        $order = Serializer::deserializeFromJson(Order::class, [
+            'transactions' => ['refunds' => $response->getContent() ?: []],
+        ]);
+        return $order->transactions->refunds ?? [];
     }
 
     /**
