@@ -9,7 +9,9 @@ use MercadoPago\Resources\OrderSearch;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPHttpClient;
+use MercadoPago\Net\MPResponse;
 use MercadoPago\Net\MPSearchRequest;
+use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Serialization\Serializer;
 
 /**
@@ -29,6 +31,8 @@ final class OrderClient extends MercadoPagoClient
     private const URL_CAPTURE = self::URL_WITH_ID . '/capture';
     private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
     private const URL_PROCESS = self::URL_WITH_ID . '/process';
+    private const URL_CONFIRM = self::URL_WITH_ID . '/confirm';
+    private const URL_EVENTS = self::URL_WITH_ID . '/events';
     private const URL_REFUND = self::URL_WITH_ID . '/refund';
 
     /** @param MPHttpClient|null $MPHttpClient Custom HTTP client. Defaults to the SDK global client. */
