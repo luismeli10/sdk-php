@@ -1,0 +1,16 @@
+[
+  {
+    "id": "ref_01JQRREFUND00000000000001",
+    "transaction_id": "pay_01JQRCONFIRM0000000000001",
+    "reference_id": "refund_ref_1234",
+    "amount": "25.00",
+    "status": "processed"
+  },
+  {
+    "id": "ref_01JQRREFUND00000000000002",
+    "transaction_id": "pay_01JQRCONFIRM0000000000001",
+    "reference_id": "refund_ref_5678",
+    "amount": "10.00",
+    "status": "processed"
+  }
+]

@@ -306,6 +306,97 @@ final class OrderClientITTest extends TestCase
         ];
     }
 
+    public function testConfirmSuccess(): void
+    {
+        $order_id = getenv("CONFIRM_ORDER_ID");
+        if (!$order_id) {
+            $this->markTestSkipped("Set CONFIRM_ORDER_ID to an in-store QR order that is ready to be confirmed.");
+        }
+
+        try {
+            $client = new OrderClient();
+            $request_options = new RequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: " . uniqid("confirm-", true)]);
+            $order = $client->confirm($order_id, $this->createConfirmRequest(), $request_options);
+
+            $this->assertSame($order_id, $order->id);
+            $this->assertNotNull($order->status);
+        } catch (MPApiException $e) {
+            $apiResponse = $e->getApiResponse();
+            $this->fail("API Exception: " . $apiResponse->getStatusCode() . " - " . json_encode($apiResponse->getContent()));
+        } catch (\Exception $e) {
+            $this->fail("Exception: " . $e->getMessage());
+        }
+    }
+
+    private function createConfirmRequest(): array
+    {
+        $request = getenv("CONFIRM_ORDER_REQUEST");
+        if (!$request) {
+            $this->markTestSkipped("Set CONFIRM_ORDER_REQUEST to the JSON confirmation payload for CONFIRM_ORDER_ID.");
+        }
+
+        $decoded_request = json_decode($request, true);
+        $this->assertIsArray($decoded_request, "CONFIRM_ORDER_REQUEST must contain a JSON object.");
+        return $decoded_request;
+    }
+
+    public function testSimulateEventSuccess(): void
+    {
+        $order_id = getenv("SIMULATE_EVENT_ORDER_ID");
+        if (!$order_id) {
+            $this->markTestSkipped("Set SIMULATE_EVENT_ORDER_ID to an in-store order that accepts simulated events.");
+        }
+
+        try {
+            $client = new OrderClient();
+            $response = $client->simulateEvent($order_id, $this->createSimulateEventRequest());
+
+            $this->assertSame(204, $response->getStatusCode());
+            $this->assertEmpty($response->getContent());
+        } catch (MPApiException $e) {
+            $apiResponse = $e->getApiResponse();
+            $this->fail("API Exception: " . $apiResponse->getStatusCode() . " - " . json_encode($apiResponse->getContent()));
+        } catch (\Exception $e) {
+            $this->fail("Exception: " . $e->getMessage());
+        }
+    }
+
+    private function createSimulateEventRequest(): array
+    {
+        $request = getenv("SIMULATE_EVENT_REQUEST");
+        if (!$request) {
+            $this->markTestSkipped("Set SIMULATE_EVENT_REQUEST to the JSON event payload for SIMULATE_EVENT_ORDER_ID.");
+        }
+
+        $decoded_request = json_decode($request, true);
+        $this->assertIsArray($decoded_request, "SIMULATE_EVENT_REQUEST must contain a JSON object.");
+        return $decoded_request;
+    }
+
+    public function testGetRefundsSuccess(): void
+    {
+        $order_id = getenv("REFUNDED_ORDER_ID");
+        if (!$order_id) {
+            $this->markTestSkipped("Set REFUNDED_ORDER_ID to an order with at least one refund.");
+        }
+
+        try {
+            $client = new OrderClient();
+            $refunds = $client->getRefunds($order_id, new RequestOptions());
+
+            $this->assertNotEmpty($refunds);
+            $this->assertInstanceOf(\MercadoPago\Resources\Order\Refund::class, $refunds[0]);
+            $this->assertNotNull($refunds[0]->id);
+            $this->assertNotNull($refunds[0]->status);
+        } catch (MPApiException $e) {
+            $apiResponse = $e->getApiResponse();
+            $this->fail("API Exception: " . $apiResponse->getStatusCode() . " - " . json_encode($apiResponse->getContent()));
+        } catch (\Exception $e) {
+            $this->fail("Exception: " . $e->getMessage());
+        }
+    }
+
     private function createCardTokenRequest(): array
     {
         return [
