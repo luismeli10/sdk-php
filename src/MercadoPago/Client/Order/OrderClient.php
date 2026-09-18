@@ -5,6 +5,8 @@ namespace MercadoPago\Client\Order;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\MercadoPagoClient;
 use MercadoPago\Resources\Order;
+use MercadoPago\Resources\Order\OrderConfirm;
+use MercadoPago\Resources\Order\OrderRefund;
 use MercadoPago\Resources\OrderSearch;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\HttpMethod;
@@ -30,6 +32,7 @@ final class OrderClient extends MercadoPagoClient
     private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
     private const URL_PROCESS = self::URL_WITH_ID . '/process';
     private const URL_REFUND = self::URL_WITH_ID . '/refund';
+    private const URL_CONFIRM = self::URL_WITH_ID . '/confirm';
 
     /** @param MPHttpClient|null $MPHttpClient Custom HTTP client. Defaults to the SDK global client. */
     public function __construct(?MPHttpClient $MPHttpClient = null)
