@@ -33,8 +33,11 @@ class Refund
     /** Refund amount in the order's currency (partial or full). */
     public ?string $amount;
 
-    /** Current refund status (e.g., "approved", "pending"). */
+    /** Current refund status (for example, "processed" or "pending"). */
     public ?string $status;
+
+    /** Granular detail complementing the refund status when returned by the API. */
+    public ?string $status_detail;
 
     /** End-to-end transaction identifier for Pix refunds. */
     public ?string $e2e_id;

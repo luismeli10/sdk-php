@@ -78,9 +78,12 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Create the order, then retrieve the mapped resource from /v1/orders/{id}
     $order = $client->create($request, $request_options);
-    echo "Order ID:" . $order->id;
+    $retrieved_order = $client->get($order->id);
+
+    echo "Order ID: " . $retrieved_order->id . "\n";
+    echo "Order status: " . $retrieved_order->status . "\n";
 
     // Step 7: Handle exceptions
 } catch (MPApiException $e) {

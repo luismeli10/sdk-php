@@ -25,11 +25,18 @@ final class OrderClient extends MercadoPagoClient
 {
     private const URL = "/v1/orders";
     private const URL_WITH_ID = "/v1/orders/%s";
-    private const URL_SEARCH = "/v1/orders";
-    private const URL_CAPTURE = self::URL_WITH_ID . '/capture';
-    private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
-    private const URL_PROCESS = self::URL_WITH_ID . '/process';
-    private const URL_REFUND = self::URL_WITH_ID . '/refund';
+
+    /** POST /v1/orders/{order_id}/capture */
+    private const URL_CAPTURE = "/v1/orders/%s/capture";
+
+    /** POST /v1/orders/{order_id}/cancel */
+    private const URL_CANCEL = "/v1/orders/%s/cancel";
+
+    /** POST /v1/orders/{order_id}/process */
+    private const URL_PROCESS = "/v1/orders/%s/process";
+
+    /** POST /v1/orders/{order_id}/refund */
+    private const URL_REFUND = "/v1/orders/%s/refund";
 
     /** @param MPHttpClient|null $MPHttpClient Custom HTTP client. Defaults to the SDK global client. */
     public function __construct(?MPHttpClient $MPHttpClient = null)
@@ -38,10 +45,15 @@ final class OrderClient extends MercadoPagoClient
     }
 
     /**
-     * Creates a new order.
+     * Creates a new order with POST `/v1/orders`.
+     *
+     * The API requires an `X-Idempotency-Key` custom header in the supplied
+     * {@see RequestOptions}. The request is serialized without reshaping so fields
+     * such as `processing_mode`, `external_reference`, and `total_amount` retain
+     * their documented request-body roles.
      *
      * @param array<string,mixed> $request Order data (type, total_amount, external_reference, payer, transactions, items, etc.).
-     * @param RequestOptions|null $request_options Per-request configuration overrides.
+     * @param RequestOptions|null $request_options Per-request configuration, including the required X-Idempotency-Key header.
      * @return Order The created order resource.
      * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
      * @throws \Exception On transport-level errors.
@@ -175,7 +187,7 @@ final class OrderClient extends MercadoPagoClient
     public function search(MPSearchRequest $request, ?RequestOptions $request_options = null): OrderSearch
     {
         $query_params = isset($request) ? $request->getParameters() : null;
-        $response = parent::send(self::URL_SEARCH, HttpMethod::GET, null, $query_params, $request_options);
+        $response = parent::send(self::URL, HttpMethod::GET, null, $query_params, $request_options);
         $result = Serializer::deserializeFromJson(OrderSearch::class, $response->getContent());
         $result->setResponse($response);
         return $result;

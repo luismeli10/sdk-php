@@ -10,9 +10,9 @@ use MercadoPago\Serialization\Mapper;
 /**
  * Represents a MercadoPago Order resource.
  *
- * An order is the top-level entity that groups items, payer information,
- * transactions (payments, refunds, chargebacks), shipping details, and
- * configuration for a purchase flow in the MercadoPago Orders API.
+ * An order is the top-level entity returned by POST /v1/orders and
+ * GET /v1/orders/{id}. It groups items, payer information, payment
+ * transactions, shipping details, and configuration for a purchase flow.
  *
  * @see \MercadoPago\Client\Order\OrderClient
  */
@@ -30,20 +30,20 @@ class Order extends MPResource
     /** Seller-defined reference to correlate the order with an external system. */
     public ?string $external_reference;
 
-    /** ISO 3166-1 alpha-2 country code where the order is processed. */
+    /** MercadoPago site/country identifier returned by the Orders API (e.g., "MLB" or "MLA"). */
     public ?string $country_code;
 
-    /** Current high-level status of the order (e.g., "opened", "closed", "expired"). */
+    /** Current Orders API status (created, processed, action_required, processing, or canceled). */
     public ?string $status;
 
     /** Granular detail complementing the order status. */
     public ?string $status_detail;
 
-    /** Determines how funds are captured (e.g., "automatic" or "manual"). */
+    /** Determines how funds are captured (automatic, manual, or automatic_async). */
     public ?string $capture_mode;
 
     /** MercadoPago user ID of the seller who owns the order. */
-    public ?string $user_id;
+    public ?int $user_id;
 
     /** URL to redirect the buyer to the Checkout PRO payment flow. Generated automatically on order creation. */
     public ?string $checkout_url;
@@ -57,7 +57,7 @@ class Order extends MPResource
     /** Total amount effectively paid by the buyer. */
     public ?string $total_paid_amount;
 
-    /** Processing mode for payments (e.g., "aggregator", "gateway"). */
+    /** Orders API processing mode ("automatic" or "manual"). */
     public ?string $processing_mode;
 
     /** Short description of the order shown to the buyer. */
@@ -87,7 +87,10 @@ class Order extends MPResource
     /** Buyer information associated with this order. Maps to {@see Payer}. */
     public array|object|null $payer;
 
-    /** Transaction container holding payments, refunds, and chargebacks. Maps to {@see Transactions}. */
+    /**
+     * Payment transaction container returned by create/get and lifecycle actions.
+     * Its payment entries map to {@see \MercadoPago\Resources\Order\Payment}.
+     */
     public array|object|null $transactions;
 
     /** Line items included in the order. Each element maps to {@see Items}. */

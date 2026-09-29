@@ -51,15 +51,10 @@ try {
     $transaction_id = $order->transactions->payments[0]->id;
     $order_id = $order->id;
 
-    // Step 5: Delete a transaction
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
-    $response = $client_transactions->delete($order_id, $transaction_id, $request_options);
-    if ($response->getStatusCode() === 204) {
-        echo "Transaction deleted successfully. HTTP Status Code: 204\n";
-    } else {
-        echo "Transaction deletion failed with status: " . $response->getStatusCode() . "\n";
-        echo "Response: " . var_dump($response->getContent()) . "\n";
-    }
+    // Step 5: DELETE /v1/orders/{order_id}/transactions/{transaction_id}
+    // DELETE does not require X-Idempotency-Key and a successful response has no entity.
+    $delete_response = $client_transactions->delete($order_id, $transaction_id);
+    echo "Transaction deleted successfully. HTTP Status Code: " . $delete_response->getStatusCode() . "\n";
 } catch (MPApiException $e) {
     echo "Error: " . $e->getApiResponse()->getStatusCode() . "\n";
     echo "Content: ";

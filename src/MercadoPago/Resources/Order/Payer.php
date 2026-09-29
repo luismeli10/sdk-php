@@ -9,8 +9,9 @@ use MercadoPago\Serialization\Mapper;
 /**
  * Represents the buyer (payer) associated with a MercadoPago order.
  *
- * Contains the buyer's personal information used for payment processing,
- * fraud prevention, and receipt generation.
+ * Maps the OrderPayer request and response shape used by POST /v1/orders and
+ * GET /v1/orders/{id}, including contact, identification, address, and the
+ * entity type required by supported payment methods such as PSE.
  *
  * @see \MercadoPago\Resources\Order
  */

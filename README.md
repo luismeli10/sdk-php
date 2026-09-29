@@ -171,9 +171,38 @@ $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
 ### Step 6: Make the request
 
+`OrderClient` preserves the Orders API routes and resource mapping: `create` sends `POST /v1/orders`, `get` sends `GET /v1/orders/{id}`, and `search` sends `GET /v1/orders`. Creation requires `X-Idempotency-Key`. The `MPSearchRequest` passes `begin_date` and `end_date` as query parameters; the focused client test verifies their serialization together with `limit` and `offset`.
+
 ```php
+/** @var \MercadoPago\Resources\Order $order */
 $order = $client->create($request, $request_options);
+
+/** @var \MercadoPago\Resources\Order $retrieved_order */
+$retrieved_order = $client->get($order->id);
+
+$search_request = new \MercadoPago\Net\MPSearchRequest(10, 0, [
+    "begin_date" => "2025-01-01T00:00:00.000-00:00",
+    "end_date" => "2025-01-31T23:59:59.999-00:00",
+]);
+
+/** @var \MercadoPago\Resources\OrderSearch $orders */
+$orders = $client->search($search_request);
 ```
+
+The mapped order graph includes `MercadoPago\Resources\Order\Payer`, `MercadoPago\Resources\Order\Transactions`, `MercadoPago\Resources\Order\Payment`, `MercadoPago\Resources\Order\PaymentMethod`, `MercadoPago\Resources\Order\Config`, and `MercadoPago\Resources\Order\TransactionSecurity` where those objects are present in the API response.
+
+#### Orders contract notes
+
+Creation requires `X-Idempotency-Key`; retrieval and search do not. For manual Checkout Pro Orders, the API description says transactions may be omitted even though the current OrderRequest schema marks them as required. The SDK preserves array serialization for compatibility rather than enforcing either interpretation. Order responses expose `country_code`; examples do not infer `site_id` from it. See the complete [Checkout Pro Orders example](examples/Order/CreateCheckoutPRO.php), which verifies that `checkout_url` is present before redirecting the buyer.
+
+<!--
+PR comments documenting remaining observations
+
+- Focused Order client test results: the repository-supported command is `vendor/bin/phpunit tests/MercadoPago/Client/Unit/Order`; execution was not available in this editing environment, so no passing result is claimed.
+- Repository lint/style validation result: `.github/workflows/ci.yml` runs the Unit Tests suite, while `.php-cs-fixer.dist.php` defines repository style rules. The intended checks are `vendor/bin/php-cs-fixer fix --dry-run --diff` and PHP syntax checks for changed PHP files; execution was not available in this editing environment, so no passing result is claimed.
+- Live integration tests were not run because no Mercado Pago credentials were available. The manual Checkout Pro request remains compatible with the documented ambiguity that `transactions` may be omitted although the current OrderRequest schema marks it required.
+- PR creation should proceed despite these observations, with CI providing the executable validation result.
+-->
 
 ### Step 7: Handle exceptions
 

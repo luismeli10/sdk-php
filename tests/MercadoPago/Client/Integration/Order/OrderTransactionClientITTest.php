@@ -137,8 +137,9 @@ final class OrderTransactionClientITTest extends TestCase
             $this->assertNotNull($transaction_id);
 
             $client_transaction = new OrderTransactionClient();
-            $transaction_delete = $client_transaction->delete($order_id, $transaction_id, $request_options);
-            $this->assertEquals(204, $transaction_delete->getStatusCode());
+            // DELETE /transactions/{transaction_id} does not require X-Idempotency-Key or RequestOptions.
+            $transaction_delete = $client_transaction->delete($order_id, $transaction_id);
+            $this->assertSame(204, $transaction_delete->getStatusCode());
         } catch (MPApiException $e) {
             $apiResponse = $e->getApiResponse();
             $statusCode = $apiResponse->getStatusCode();

@@ -2,12 +2,15 @@
 
 namespace MercadoPago\Tests\Client\Integration\Order;
 
+use MercadoPago\Client\CardToken\CardTokenClient;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Net\MPSearchRequest;
+use MercadoPago\Resources\Order;
+use MercadoPago\Resources\OrderSearch;
 use PHPUnit\Framework\TestCase;
-use MercadoPago\Client\CardToken\CardTokenClient;
 
 /**
  * OrderClient integration tests.
@@ -25,6 +28,9 @@ final class OrderClientITTest extends TestCase
             $client = new OrderClient();
             $request = $this->createRequest();
             $request_options = new RequestOptions();
+            $request_options->setCustomHeaders([
+                "X-Idempotency-Key: order-create-" . bin2hex(random_bytes(16)),
+            ]);
             $order = $client->create($request, $request_options);
             $this->assertNotNull($order->id);
         } catch (MPApiException $e) {
