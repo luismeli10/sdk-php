@@ -5,6 +5,8 @@
   "capture_mode": "automatic_async",
   "external_reference": "ext_ref_1234",
   "total_amount": "200.00",
+  "total_paid_amount": "200.00",
+  "currency": "BRL",
   "site_id": "MLB",
   "status": "processed",
   "status_detail": "accredited",

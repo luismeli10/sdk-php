@@ -5,7 +5,6 @@ namespace Examples\Order;
 // Step 1: Require the library from your Composer vendor folder
 require_once '../../vendor/autoload.php';
 
-use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;

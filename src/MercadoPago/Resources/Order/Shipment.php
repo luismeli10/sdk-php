@@ -31,7 +31,7 @@ class Shipment
     /** When true, shipping is free for the buyer. Cannot be combined with cost > 0. */
     public ?bool $free_shipping;
 
-    /** List of free shipping method IDs available to the buyer. */
+    /** List of free shipping method objects available to the buyer. */
     public ?array $free_methods;
 
     /** Delivery address for the shipment. Maps to Address. */

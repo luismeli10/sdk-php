@@ -30,10 +30,10 @@ class Order extends MPResource
     /** Seller-defined reference to correlate the order with an external system. */
     public ?string $external_reference;
 
-    /** ISO 3166-1 alpha-2 country code where the order is processed. */
+    /** MercadoPago site identifier where the order was created (for example, "MLB"). */
     public ?string $country_code;
 
-    /** Current high-level status of the order (e.g., "opened", "closed", "expired"). */
+    /** Current high-level status of the order (e.g., "created", "processed", "canceled"). */
     public ?string $status;
 
     /** Granular detail complementing the order status. */

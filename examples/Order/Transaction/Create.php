@@ -20,7 +20,7 @@ MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
 $client = new OrderTransactionClient();
 
 try {
-    // Step 4: Create the request
+    // Step 4: Create the transaction payload for POST /v1/orders/{order_id}/transactions
     $request = [
         "payments" => [
             [

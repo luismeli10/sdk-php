@@ -78,7 +78,7 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Create the order with POST /v1/orders
     $order = $client->create($request, $request_options);
     echo "Order ID:" . $order->id;
 

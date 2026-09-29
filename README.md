@@ -192,125 +192,57 @@ try{
 }
 ```
 
-## 🌟 Getting started with payment via Checkout Pro
+## 🌟 Getting started with Checkout Pro via Orders
 
-### Step 1: Require the libraries
+The SDK exposes the bounded Orders API through `MercadoPago\Client\Order\OrderClient` and `MercadoPago\Client\Order\OrderTransactionClient`. Create the order with its transaction data; no separate transaction-creation step is required before processing.
 
-```php
-use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Client\Preference\PreferenceClient;
-use MercadoPago\Exceptions\MPApiException;
-```
+### Create an order
 
-### Step 2: Create an authentication function
+The snippet uses the `RequestOptions`, `OrderClient`, and `MPApiException` imports and access-token configuration established above.
 
 ```php
-protected function authenticate()
-{
-    // Getting the access token from .env file (create your own function)
-    $mpAccessToken = getVariableFromEnv('mercado_pago_access_token');
-    // Set the token the SDK's config
-    MercadoPagoConfig::setAccessToken($mpAccessToken);
-    // (Optional) Set the runtime enviroment to LOCAL if you want to test on localhost
-    // Default value is set to SERVER
-    MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
+$order_client = new OrderClient();
+$request = [
+    'type' => 'online',
+    'processing_mode' => 'automatic',
+    'capture_mode' => 'automatic_async',
+    'external_reference' => 'checkout-pro-order-001',
+    'total_amount' => '500.00',
+    'payer' => [
+        'email' => '<PAYER_EMAIL>',
+    ],
+    'transactions' => [
+        'payments' => [
+            [
+                'amount' => '500.00',
+                'payment_method' => [
+                    'id' => 'master',
+                    'type' => 'credit_card',
+                    'token' => '<CARD_TOKEN>',
+                    'installments' => 1,
+                ],
+            ],
+        ],
+    ],
+];
+
+$options = new RequestOptions();
+$options->setCustomHeaders([
+    'X-Idempotency-Key: <SOME_UNIQUE_VALUE>',
+]);
+
+try {
+    $order = $order_client->create($request, $options);
+    echo 'Order ID: ' . $order->id;
+} catch (MPApiException $e) {
+    echo 'Status code: ' . $e->getApiResponse()->getStatusCode() . "\n";
+    var_dump($e->getApiResponse()->getContent());
 }
 ```
 
-### Step 3: Create customer's preference before proceeding to Checkout Pro page
+`OrderClient` maps successful order responses to `MercadoPago\Resources\Order` and search responses to `MercadoPago\Resources\OrderSearch`. Nested transaction data is represented by `MercadoPago\Resources\Order\Transactions`, `MercadoPago\Resources\Order\Payment`, and `MercadoPago\Resources\Order\PaymentMethod`.
 
-```php
-// Function that will return a request object to be sent to Mercado Pago API
-function createPreferenceRequest($items, $payer): array
-{
-    $paymentMethods = [
-        "excluded_payment_methods" => [],
-        "installments" => 12,
-        "default_installments" => 1
-    ];
-
-    $backUrls = array(
-        'success' => route('mercadopago.success'),
-        'failure' => route('mercadopago.failed')
-    );
-
-    $request = [
-        "items" => $items,
-        "payer" => $payer,
-        "payment_methods" => $paymentMethods,
-        "back_urls" => $backUrls,
-        "statement_descriptor" => "NAME_DISPLAYED_IN_USER_BILLING",
-        "external_reference" => "1234567890",
-        "expires" => false,
-        "auto_return" => 'approved',
-    ];
-
-    return $request;
-}
-```
-
-### Step 4: Create the preference on Mercado Pago ([DOCS](https://www.mercadopago.com.br/developers/pt/docs/sdks-library/server-side/php/preferences))
-
-```php
-public function createPaymentPreference(): ?Preference
-{
-    // Fill the data about the product(s) being purchased
-    $product1 = array(
-        "id" => "1234567890",
-        "title" => "Product 1 Title",
-        "description" => "Product 1 Description",
-        "currency_id" => "BRL",
-        "quantity" => 12,
-        "unit_price" => 9.90
-    );
-
-    $product2 = array(
-        "id" => "9012345678",
-        "title" => "Product 2 Title",
-        "description" => "Product 2 Description",
-        "currency_id" => "BRL",
-        "quantity" => 5,
-        "unit_price" => 19.90
-    );
-
-    // Mount the array of products that will integrate the purchase amount
-    $items = array($product1, $product2);
-
-    // Retrieve information about the user (use your own function)
-    $user = getSessionUser();
-
-    $payer = array(
-        "name" => $user->name,
-        "surname" => $user->surname,
-        "email" => $user->email,
-    );
-
-    // Create the request object to be sent to the API when the preference is created
-    $request = createPreferenceRequest($item, $payer);
-
-    // Instantiate a new Preference Client
-    $client = new PreferenceClient();
-
-    try {
-        // Send the request that will create the new preference for user's checkout flow
-        $preference = $client->create($request);
-
-        // Useful props you could use from this object is 'init_point' (URL to Checkout Pro) or the 'id'
-        return $preference;
-    } catch (MPApiException $error) {
-        // Here you might return whatever your app needs.
-        // We are returning null here as an example.
-        return null;
-    }
-}
-```
-
-In case you need to retrieve the preference by ID:
-
-```php
-    $client = new PreferenceClient();
-    $client->get("123456789");
-```
+The supported order routes are `/v1/orders`, `/v1/orders/{id}`, `/v1/orders/{order_id}/cancel`, `/v1/orders/{order_id}/process`, `/v1/orders/{order_id}/capture`, and `/v1/orders/{order_id}/refund`. `OrderTransactionClient` operates on `/v1/orders/{order_id}/transactions` and `/v1/orders/{order_id}/transactions/{transaction_id}`. Supply `X-Idempotency-Key` through `RequestOptions` only for operations that declare it: order create, cancel, process, capture, and refund, plus transaction create and update. The transaction delete operation does not declare this header. A full refund can omit the request body, while a partial refund provides the amount in the request body.
 
 ## 📚 Documentation
 

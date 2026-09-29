@@ -20,8 +20,9 @@ use MercadoPago\MercadoPagoConfig;
  *   2. Recurring charge — subsequent MIT charge without CVV, referencing step 1.
  *
  * Prerequisites:
- *   - A customer created via POST /v1/customers             → CUSTOMER_ID
- *   - A payment profile created via POST /v1/customers/{id}/payment-profiles → PAYMENT_PROFILE_ID
+ *   - An existing customer ID and automatic-payment profile ID.
+ *
+ * Both charges in this example are created only through POST /v1/orders.
  *
  * @see https://www.mercadopago.com/developers/en/docs/automatic-payments-orders/overview
  */

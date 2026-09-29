@@ -22,7 +22,7 @@ class IntegrationData
     /** Identifier of the corporation that owns the integration. */
     public ?string $corporation_id;
 
-    /** MercadoPago application ID used to create the order. */
+    /** MercadoPago application identifier used to create the order. */
     public ?string $application_id;
 
     /** Certified integrator identifier assigned by MercadoPago. */

@@ -1,7 +1,15 @@
 {
+  "id": "pay_01JD26HQ96FFHBD2CHDW984TZM",
+  "reference_id": "transaction_reference_001",
+  "amount": "100.00",
+  "status": "created",
+  "status_detail": "pending",
   "payment_method": {
     "id": "master",
     "type": "credit_card",
+    "token": "updated_card_token",
+    "issuer_id": "master",
+    "statement_descriptor": "MERCADOPAGO",
     "installments": 1
   }
 }

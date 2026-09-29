@@ -5,7 +5,7 @@
   "external_reference": "ext_ref_checkout_pro_001",
   "marketplace_fee": "5.00",
   "total_amount": "500.00",
-  "checkout_url": "https://www.mercadopago.com/checkout/v1/redirect?order_id=ORDTST01KS5AJ6HTK2HRQ3XJ3C2JCKP9",
+  "total_paid_amount": "0.00",
   "expiration_time": "P1D",
   "country_code": "ARG",
   "user_id": "1858095454",

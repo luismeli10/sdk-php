@@ -51,7 +51,7 @@ try {
     // Step 6: Create the Order
     $order = $order_client->create($create_order_request, $request_options);
 
-    // Step 7: Create the request to refund Order partially
+    // Step 7: Create the body for POST /v1/orders/{order_id}/refund
     $refund_request = [
         "transactions" => [
             [

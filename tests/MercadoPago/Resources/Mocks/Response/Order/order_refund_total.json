@@ -1,8 +1,32 @@
 {
   "id": "01JDWHNG2GR2WHGBMRFX126YBC",
+  "type": "online",
+  "processing_mode": "automatic",
+  "capture_mode": "automatic_async",
+  "external_reference": "ext_ref_total_refund",
+  "total_amount": "100.00",
+  "total_paid_amount": "0.00",
+  "currency": "BRL",
+  "site_id": "MLB",
   "status": "refunded",
   "status_detail": "refunded",
+  "created_date": "2024-11-29T13:10:01.000Z",
+  "last_updated_date": "2024-11-29T13:15:10.000Z",
   "transactions": {
+    "payments": [
+      {
+        "id": "pay_01JDWHNG2GR2WHGBMRFY7HP5ZB",
+        "reference_id": "payment_reference_002",
+        "amount": "100.00",
+        "status": "refunded",
+        "status_detail": "refunded",
+        "payment_method": {
+          "id": "master",
+          "type": "credit_card",
+          "installments": 1
+        }
+      }
+    ],
     "refunds": [
       {
         "id": "ref_01JDWHPXYC42ESJ40V4D3SMHW1",
