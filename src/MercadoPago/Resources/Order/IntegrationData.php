@@ -28,8 +28,14 @@ class IntegrationData
     /** Certified integrator identifier assigned by MercadoPago. */
     public ?string $integrator_id;
 
-    /** E-commerce platform identifier (e.g., for WooCommerce, Magento, etc.). */
+    /** E-commerce platform identifier supplied as order integration metadata. */
     public ?string $platform_id;
+
+    /** Numeric sponsor identifier supplied directly by Order API responses. */
+    public ?int $sponsor_id;
+
+    /** Sponsor user ID supplied as integration metadata. */
+    public ?int $sponsor_id;
 
     /** Sponsor details when the order is created on behalf of another account. Maps to {@see Sponsor}. */
     public array|object|null $sponsor;

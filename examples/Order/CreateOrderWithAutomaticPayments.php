@@ -80,6 +80,7 @@ try {
 
     echo "First payment order ID: " . $firstOrder->id . "\n";
     echo "Status: " . $firstOrder->status . "\n";
+    echo "Country code: " . $firstOrder->country_code . "\n";
 
     // Save the payment ID for the next recurring charge
     $firstPaymentId = $firstOrder->transactions->payments[0]->id ?? null;

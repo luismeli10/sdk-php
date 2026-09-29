@@ -25,6 +25,7 @@ final class OrderClientITTest extends TestCase
             $client = new OrderClient();
             $request = $this->createRequest();
             $request_options = new RequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: " . uniqid("order-create-", true)]);
             $order = $client->create($request, $request_options);
             $this->assertNotNull($order->id);
         } catch (MPApiException $e) {

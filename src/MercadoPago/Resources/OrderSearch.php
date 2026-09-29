@@ -21,7 +21,7 @@ class OrderSearch extends MPResource
     /** Pagination metadata (offset, limit, total). Maps to {@see \MercadoPago\Resources\Common\Paging}. */
     public array|object|null $paging;
 
-    /** Array of {@see Order} resources matching the search criteria. */
+    /** Array of {@see Order} resources returned by GET `/v1/orders` for the requested begin_date/end_date range. */
     public array|object|null $data;
 
     private $map = [

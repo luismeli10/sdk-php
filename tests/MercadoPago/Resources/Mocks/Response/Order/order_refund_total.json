@@ -2,6 +2,7 @@
   "id": "01JDWHNG2GR2WHGBMRFX126YBC",
   "status": "refunded",
   "status_detail": "refunded",
+  "total_amount": "100.00",
   "transactions": {
     "refunds": [
       {

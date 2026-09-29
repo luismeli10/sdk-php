@@ -5,9 +5,9 @@
   "capture_mode": "manual",
   "external_reference": "ext_ref_1234",
   "total_amount": "200.00",
-  "site_id": "MLB",
-  "status": "cancelled",
-  "status_detail": "cancelled",
+  "country_code": "MLB",
+  "status": "canceled",
+  "status_detail": "created",
   "created_date": "2024-11-22T20:45:16.572Z",
   "last_updated_date": "2024-11-22T20:45:44.063Z",
   "integration_data": {

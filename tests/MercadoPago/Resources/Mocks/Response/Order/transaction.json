@@ -3,6 +3,8 @@
       {
         "id": "pay_01JD26HQ96FFHBD2CHDW984TZM",
         "amount": "100.00",
+        "status": "created",
+        "status_detail": "created",
         "payment_method": {
           "id": "master",
           "type": "credit_card",

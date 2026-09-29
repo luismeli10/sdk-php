@@ -61,8 +61,8 @@ try {
         ],
     ];
 
-    // Step 8: Set a new X-Idempotency-Key
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
+    // Step 8: Set a new X-Idempotency-Key for POST /v1/orders/{order_id}/refund
+    $request_options->setCustomHeaders(["X-Idempotency-Key: <A_NEW_UNIQUE_VALUE>"]);
 
     // Step 9: Refund the Order
     sleep(3);

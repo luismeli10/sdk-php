@@ -5,9 +5,9 @@
   "capture_mode": "automatic_async",
   "external_reference": "ext_12345",
   "total_amount": "100.00",
-  "site_id": "MLB",
+  "country_code": "MLB",
   "status": "processed",
-  "status_detail": "processed",
+  "status_detail": "accredited",
   "created_date": "2024-11-22T15:26:56.704Z",
   "last_updated_date": "2024-11-22T15:27:23.987Z",
   "integration_data": {
@@ -23,7 +23,7 @@
         "amount": "100.00",
         "reference_id": "0001puaa94",
         "status": "processed",
-        "status_detail": "processed",
+        "status_detail": "accredited",
         "payment_method": {
           "id": "master",
           "type": "credit_card",

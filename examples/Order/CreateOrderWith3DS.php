@@ -31,7 +31,7 @@ try {
         "config" => [
             "online" => [
                 "transaction_security" => [
-                    "validation" => "on_fraud_risk",
+                    "validation" => "supported",
                     "liability_shift" => "required"
                 ]
             ]

@@ -51,10 +51,10 @@ try {
     // Step 6: Create the Order
     $order = $order_client->create($create_order_request, $request_options);
 
-    // Step 7: Set a new X-Idempotency-Key
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
+    // Step 7: Set a new X-Idempotency-Key for POST /v1/orders/{order_id}/refund
+    $request_options->setCustomHeaders(["X-Idempotency-Key: <A_NEW_UNIQUE_VALUE>"]);
 
-    // Step 8: Refund the Order
+    // Step 8: Omit the body (null) to request a full refund
     sleep(3);
     $refunded_order = $order_client->refund($order->id, null, $request_options);
 

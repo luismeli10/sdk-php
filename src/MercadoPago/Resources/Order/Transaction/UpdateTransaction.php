@@ -20,6 +20,18 @@ class UpdateTransaction extends MPResource
     /** Class mapper. */
     use Mapper;
 
+    /** Unique identifier of the updated transaction. */
+    public ?string $id;
+
+    /** Updated transaction amount represented as a decimal string. */
+    public ?string $amount;
+
+    /** Current transaction status. */
+    public ?string $status;
+
+    /** Granular transaction status detail. */
+    public ?string $status_detail;
+
     /** Updated payment method details for the transaction. Maps to {@see \MercadoPago\Resources\Order\PaymentMethod}. */
     public array|object|null $payment_method;
 
