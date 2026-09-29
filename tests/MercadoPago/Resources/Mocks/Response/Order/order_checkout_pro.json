@@ -16,7 +16,10 @@
   "created_date": "2026-05-21T13:10:56.845Z",
   "last_updated_date": "2026-05-21T13:10:56.845Z",
   "integration_data": {
-    "application_id": "8772548647196351"
+    "application_id": "8772548647196351",
+    "platform_id": null,
+    "integrator_id": null,
+    "sponsor_id": null
   },
   "payer": {
     "email": "buyer@testuser.com",

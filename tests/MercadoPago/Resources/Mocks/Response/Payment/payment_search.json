@@ -293,8 +293,7 @@
       },
       "corporation_id": null,
       "operation_type": "regular_payment",
-      "point_of_interaction": {
-      },
+      "point_of_interaction": {},
       "fee_details": [
         {
           "amount": 4.99,

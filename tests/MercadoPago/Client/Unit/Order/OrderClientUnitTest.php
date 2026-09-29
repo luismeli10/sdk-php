@@ -4,9 +4,9 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
+use MercadoPago\Resources\Order;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
 
 /**
@@ -18,8 +18,8 @@ final class OrderClientUnitTest extends BaseClient
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/order.json';
         $mock_http_request = $this->mockHttpRequest($filepath, 200);
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $MPHttpClient = new MPDefaultHttpClient($mock_http_request);
+        MercadoPagoConfig::setHttpClient($MPHttpClient);
         $client = new OrderClient();
 
         $order = $client->create($this->createRequest());
@@ -71,8 +71,8 @@ final class OrderClientUnitTest extends BaseClient
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/order_capture.json';
         $mock_http_request = $this->mockHttpRequest($filepath, 200);
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $MPHttpClient = new MPDefaultHttpClient($mock_http_request);
+        MercadoPagoConfig::setHttpClient($MPHttpClient);
         $client = new OrderClient();
 
         $order = $client->capture("01HRYFWNYRE1MR1E60MW3X0T2P");
@@ -85,8 +85,8 @@ final class OrderClientUnitTest extends BaseClient
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/get_order_response.json';
         $mock_http_request = $this->mockHttpRequest($filepath, 200);
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $MPHttpClient = new MPDefaultHttpClient($mock_http_request);
+        MercadoPagoConfig::setHttpClient($MPHttpClient);
         $client = new OrderClient();
 
         $orderId = "01JD2P9GGXAPBDGG6YT90N77M3";
@@ -106,8 +106,8 @@ final class OrderClientUnitTest extends BaseClient
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/order_cancel.json';
         $mock_http_request = $this->mockHttpRequest($filepath, 200);
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $MPHttpClient = new MPDefaultHttpClient($mock_http_request);
+        MercadoPagoConfig::setHttpClient($MPHttpClient);
 
         $client = new OrderClient();
         $order_id = "01JDASYCCVWTT08J5RDYAJ5CBZ";

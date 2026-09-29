@@ -26,10 +26,10 @@ class Config
     public ?string $default_payment_due_date;
 
     /** Payment method restrictions, defaults, and installment settings. Maps to {@see PaymentMethodConfig}. */
-    public array|object|null $payment_method;
+    public PaymentMethodConfig|array|null $payment_method;
 
     /** Online checkout configuration (redirect URLs, security). Maps to {@see OnlineConfig}. */
-    public array|object|null $online;
+    public OnlineConfig|array|null $online;
 
     private $map = [
         "payment_method" => "MercadoPago\Resources\Order\PaymentMethodConfig",

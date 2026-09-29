@@ -36,7 +36,8 @@
         "financial_institutions": [],
         "processing_modes": [
             "aggregator"
-        ]
+        ],
+        "ordering": 1
     },
     {
         "id": "elo",

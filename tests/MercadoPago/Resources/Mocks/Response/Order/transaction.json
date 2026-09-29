@@ -1,13 +1,16 @@
 {
-    "payments": [
-      {
-        "id": "pay_01JD26HQ96FFHBD2CHDW984TZM",
-        "amount": "100.00",
-        "payment_method": {
-          "id": "master",
-          "type": "credit_card",
-          "installments": 3
-        }
+  "payments": [
+    {
+      "id": "pay_01JD26HQ96FFHBD2CHDW984TZM",
+      "reference_id": "transaction-reference",
+      "status": "pending",
+      "status_detail": "pending_waiting_payment",
+      "amount": "100.00",
+      "payment_method": {
+        "id": "master",
+        "type": "credit_card",
+        "installments": 3
       }
-    ]
+    }
+  ]
 }

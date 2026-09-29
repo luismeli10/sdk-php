@@ -16,7 +16,9 @@ MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
 // In case you want to test in your local machine first, set runtime enviroment to LOCAL
 MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
 
-// Step 3: Initialize the API client
+// Step 3: Initialize the manual Order transaction API client.
+// It adds payments through /v1/orders/{order_id}/transactions and updates or deletes
+// one through /v1/orders/{order_id}/transactions/{transaction_id}.
 $client = new OrderTransactionClient();
 
 try {
@@ -39,7 +41,7 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Make the request through the transaction client contract
     $transaction = $client->create("<ORDER_ID>", $request, $request_options);
     echo "Payment ID: " . $transaction->payments[0]->id;
     echo "\nPayment method ID: " . $transaction->payments[0]->payment_method->id;

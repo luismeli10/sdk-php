@@ -52,7 +52,6 @@ try {
     $order_id = $order->id;
 
     // Step 5: Delete a transaction
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
     $response = $client_transactions->delete($order_id, $transaction_id, $request_options);
     if ($response->getStatusCode() === 204) {
         echo "Transaction deleted successfully. HTTP Status Code: 204\n";

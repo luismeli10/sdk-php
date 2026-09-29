@@ -38,110 +38,36 @@ That's it! Mercado Pago SDK has been successfully installed.
 
 Here you can check eg. data structures for each parameter used by the SDK for each class.
 
-## 🌟 Getting Started with payment via your own website forms
+## 🌟 Getting started with Checkout Pro via Orders
 
-Simple usage looks like:
+The Orders client creates and manages Checkout Pro orders through `/v1/orders`. `MercadoPago\Client\Order\OrderClient::__construct(?MPHttpClient $MPHttpClient = null)` accepts an optional `MercadoPago\Net\MPHttpClient`; the `$MPHttpClient` name is part of the public contract for PHP 8 named arguments. Likewise, `MercadoPago\Client\Order\OrderClient::get(string $order_id, ...)` preserves the `$order_id` parameter name and URL-encodes it with `rawurlencode($order_id)`. Individual responses map to `MercadoPago\Resources\Order`, while search responses map to `MercadoPago\Resources\OrderSearch`. Transaction updates are handled by `MercadoPago\Client\Order\OrderTransactionClient::update`, not by `OrderClient`.
+
+### Create an order
 
 ```php
 <?php
-    // Step 1: Require the library from your Composer vendor folder
-    require_once 'vendor/autoload.php';
-
-    use MercadoPago\Client\Common\RequestOptions;
-    use MercadoPago\Client\Order\OrderClient;
-    use MercadoPago\Exceptions\MPApiException;
-    use MercadoPago\MercadoPagoConfig;
-
-    // Step 2: Set production or sandbox access token
-    MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
-    // Step 2.1 (optional - default is SERVER): Set your runtime enviroment from MercadoPagoConfig::RUNTIME_ENVIROMENTS
-    // In case you want to test in your local machine first, set runtime enviroment to LOCAL
-    MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
-
-    // Step 3: Initialize the API client
-    $client = new OrderClient();
-
-    try {
-
-        // Step 4: Create the request array
-        $request = [
-            "type" => "online",
-            "processing_mode" => "automatic",
-            "total_amount" => "1000.00",
-            "external_reference" => "ext_ref_1234",
-            "capture_mode" => "automatic_async",
-            "payer" => [
-                "email" => "<PAYER_EMAIL>",
-            ],
-            "transactions" => [
-                "payments" => [
-                    [
-                        "amount" => "1000.00",
-                        "payment_method" => [
-                            "id" => "master",
-                            "type" => "credit_card",
-                            "token" => "<CARD_TOKEN>",
-                            "installments" => 1,
-                            "statement_descriptor" => "Store name",
-                        ]
-                    ]
-                ]
-            ]
-        ];
-
-        // Step 5: Create the request options, setting X-Idempotency-Key
-        $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
-
-        // Step 6: Make the request
-        $order = $client->create($request, $request_options);
-        echo "Order ID:" . $order->id;
-
-    // Step 7: Handle exceptions
-    } catch (MPApiException $e) {
-        echo "Status code: " . $e->getApiResponse()->getStatusCode() . "\n";
-        echo "Content: ";
-        var_dump($e->getApiResponse()->getContent());
-        echo "\n";
-    } catch (\Exception $e) {
-        echo $e->getMessage();
-    }
-```
-
-### Step 1: Require the library from your Composer vendor folder
-
-```php
 require_once 'vendor/autoload.php';
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
-```
 
-### Step 2: Set production or sandbox access token
-
-```php
 MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
-```
-
-You can also set another properties as quantity of retries, tracking headers, timeouts and a custom http client.
-
-### Step 3: Initialize the API client
-
-```php
 $client = new OrderClient();
-```
 
-### Step 4: Create the request array
-
-```php
 $request = [
     "type" => "online",
     "processing_mode" => "automatic",
     "total_amount" => "1000.00",
     "external_reference" => "ext_ref_1234",
     "capture_mode" => "automatic_async",
+    "config" => [
+        "online" => [
+            // An empty JSON object disables additional transaction security requirements.
+            "transaction_security" => json_decode("{}"),
+        ],
+    ],
     "payer" => [
         "email" => "<PAYER_EMAIL>",
     ],
@@ -155,44 +81,63 @@ $request = [
                     "token" => "<CARD_TOKEN>",
                     "installments" => 1,
                     "statement_descriptor" => "Store name",
-                ]
-            ]
-        ]
-    ]
+                ],
+            ],
+        ],
+    ],
 ];
-```
 
-### Step 5: Create the request options, setting X-Idempotency-Key
-
-```php
 $request_options = new RequestOptions();
 $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
-```
 
-### Step 6: Make the request
-
-```php
-$order = $client->create($request, $request_options);
-```
-
-### Step 7: Handle exceptions
-
-```php
-try{
-    // Do your stuff here
+try {
+    $order = $client->create($request, $request_options); // POST /v1/orders
+    echo "Order ID: " . $order->id . "\n";
+    echo "Country: " . $order->country_code . "\n";
+    echo "Client token: " . $order->client_token . "\n";
 } catch (MPApiException $e) {
-    // Handle API exceptions
     echo "Status code: " . $e->getApiResponse()->getStatusCode() . "\n";
-    echo "Content: ";
     var_dump($e->getApiResponse()->getContent());
-    echo "\n";
 } catch (\Exception $e) {
-    // Handle all other exceptions
     echo $e->getMessage();
 }
 ```
 
-## 🌟 Getting started with payment via Checkout Pro
+The payment collection is available as `transactions.payments`; transaction security settings belong to `config.online.transaction_security`.
+
+### Retrieve and search orders
+
+Retrieve one order with `GET /v1/orders/{id}`:
+
+```php
+$order = $client->get("<ORDER_ID>");
+```
+
+Search uses `GET /v1/orders`. The `begin_date` and `end_date` filters are required and use ISO 8601 date-time values:
+
+```php
+use MercadoPago\Net\MPSearchRequest;
+
+$search_request = new MPSearchRequest(20, 0, [
+    "begin_date" => "2024-01-01T00:00:00Z",
+    "end_date" => "2024-01-31T23:59:59Z",
+]);
+$orders = $client->search($search_request);
+```
+
+### Manage the order lifecycle
+
+Lifecycle operations that use `POST` require an `X-Idempotency-Key`, supplied through `RequestOptions` as shown above:
+
+```php
+$cancelled = $client->cancel("<ORDER_ID>", $request_options); // POST /v1/orders/{order_id}/cancel
+$processed = $client->process("<ORDER_ID>", $request_options); // POST /v1/orders/{order_id}/process
+$captured = $client->capture("<ORDER_ID>", $request_options); // POST /v1/orders/{order_id}/capture
+$refunded = $client->refund("<ORDER_ID>", null, $request_options); // POST /v1/orders/{order_id}/refund
+$partially_refunded = $client->refund("<ORDER_ID>", ["transactions" => [["id" => "<TRANSACTION_ID>", "amount" => "25.00"]]], $request_options);
+```
+
+## 🌟 Legacy Checkout Pro via Preferences
 
 ### Step 1: Require the libraries
 

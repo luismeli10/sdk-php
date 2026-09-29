@@ -48,13 +48,13 @@ class OnlineConfig
     public ?array $tracks;
 
     /** Payment retry configuration for this order. Maps to {@see Retries}. */
-    public array|object|null $retries;
+    public Retries|array|null $retries;
 
     /** Differential pricing configuration for offering different prices per payment method. Maps to DifferentialPricing. */
     public array|object|null $differential_pricing;
 
     /** 3D Secure and other transaction security settings. Maps to {@see TransactionSecurity}. */
-    public array|object|null $transaction_security;
+    public TransactionSecurity|array|null $transaction_security;
 
     private $map = [
         "tracks" => "MercadoPago\Resources\Order\Track",

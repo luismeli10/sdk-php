@@ -33,6 +33,9 @@ class Order extends MPResource
     /** ISO 3166-1 alpha-2 country code where the order is processed. */
     public ?string $country_code;
 
+    /** MercadoPago site identifier where the order was created (e.g., "MLB", "MLA"). */
+    public ?string $site_id;
+
     /** Current high-level status of the order (e.g., "opened", "closed", "expired"). */
     public ?string $status;
 
@@ -81,8 +84,8 @@ class Order extends MPResource
     /** ISO 8601 duration or timestamp after which the order expires. */
     public ?string $expiration_time;
 
-    /** Integration metadata linking the order to a platform, integrator, or sponsor. Maps to {@see IntegrationData}. */
-    public array|object|null $integration_data;
+    /** Integration metadata linking the order to a platform, integrator, or sponsor. Maps to {@see \MercadoPago\Resources\Order\IntegrationData}. */
+    public \MercadoPago\Resources\Order\IntegrationData|array|null $integration_data;
 
     /** Buyer information associated with this order. Maps to {@see Payer}. */
     public array|object|null $payer;
@@ -93,8 +96,8 @@ class Order extends MPResource
     /** Line items included in the order. Each element maps to {@see Items}. */
     public ?array $items;
 
-    /** Order-level configuration for payment methods and online checkout. Maps to {@see Config}. */
-    public array|object|null $config;
+    /** Order-level configuration for payment methods and online checkout. Maps to {@see \MercadoPago\Resources\Order\Config}. */
+    public \MercadoPago\Resources\Order\Config|array|null $config;
 
     /** Arbitrary key-value pairs with additional context about the order. */
     public ?array $additional_info;

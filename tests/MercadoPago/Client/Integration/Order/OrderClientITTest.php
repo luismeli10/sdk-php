@@ -2,12 +2,12 @@
 
 namespace MercadoPago\Tests\Client\Integration\Order;
 
+use MercadoPago\Client\CardToken\CardTokenClient;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use PHPUnit\Framework\TestCase;
-use MercadoPago\Client\CardToken\CardTokenClient;
 
 /**
  * OrderClient integration tests.
@@ -123,7 +123,8 @@ final class OrderClientITTest extends TestCase
             $order = $client->create($request, $request_options);
             $this->assertNotNull($order->id);
 
-            $order_get = $client->get($order->id, $request_options);
+            $order_get = $client->get(order_id: $order->id, request_options: $request_options);
+            $this->assertInstanceOf(\MercadoPago\Resources\Order::class, $order_get);
             $this->assertNotNull($order_get->id);
             $this->assertSame($order->id, $order_get->id);
             $this->assertSame($order->total_amount, $order_get->total_amount);

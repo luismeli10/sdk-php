@@ -12,13 +12,15 @@ use MercadoPago\Serialization\Mapper;
  * Tracks the authentication status, liability shift outcome, and challenge URL
  * for card payments requiring strong customer authentication (SCA/3DS).
  *
- * @see \MercadoPago\Resources\Order\PaymentMethod
  * @see \MercadoPago\Resources\Order\OnlineConfig
  */
 class TransactionSecurity
 {
     /** Class mapper. */
     use Mapper;
+
+    /** Security mechanism requested for the online transaction (e.g., "none" or "3ds"). */
+    public ?string $type;
 
     /** Unique identifier of the 3DS authentication transaction. */
     public ?string $id;

@@ -71,8 +71,8 @@ try {
         $payment = $payments[0];
         
         if ($payment->status === "action_required" && $payment->status_detail === "pending_challenge") {
-            // Challenge is required - get the URL from payment_method.transaction_security.url
-            $challengeUrl = $payment->payment_method->transaction_security->url;
+            // Challenge is required - get the URL from config.online.transaction_security.url
+            $challengeUrl = $order->config->online->transaction_security->url;
             
             echo "Order ID: " . $order->id . "\n";
             echo "Payment requires 3DS Challenge\n";

@@ -139,5 +139,7 @@
   "merchant_account_id": null,
   "merchant_number": null,
   "acquirer_reconciliation": [],
-  "point_of_interaction": {}
+  "point_of_interaction": {
+    "transaction_data": {}
+  }
 }

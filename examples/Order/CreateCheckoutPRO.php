@@ -79,6 +79,7 @@ try {
                 "failure_url" => "https://example.com/failure",
                 "pending_url" => "https://example.com/pending",
                 "auto_return" => "approved",
+                "transaction_security" => (object) [],
                 "tracks" => [
                     [
                         "type" => "google_ad",
