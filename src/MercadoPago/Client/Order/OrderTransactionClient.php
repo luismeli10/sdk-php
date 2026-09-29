@@ -7,16 +7,18 @@ use MercadoPago\Client\MercadoPagoClient;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPHttpClient;
+use MercadoPago\Net\MPResponse;
+use MercadoPago\Resources\Order\Payment;
+use MercadoPago\Resources\Order\PaymentMethod;
 use MercadoPago\Resources\Order\Transaction\UpdateTransaction;
 use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Serialization\Serializer;
-use MercadoPago\Net\MPResponse;
 
 /**
- * Client for the Order Transactions API (`/v1/orders/{id}/transactions`).
+ * Client for the manual Order Transactions API.
  *
- * Manages payment transactions within an order, supporting multi-payment
- * scenarios where an order can contain multiple transactions (split payments).
+ * Adds payments through `/v1/orders/{order_id}/transactions` and updates or
+ * deletes one through `/v1/orders/{order_id}/transactions/{transaction_id}`.
  */
 final class OrderTransactionClient extends MercadoPagoClient
 {
@@ -30,12 +32,15 @@ final class OrderTransactionClient extends MercadoPagoClient
     }
 
     /**
-     * Creates a new transaction within an order.
+     * Adds payment transactions to a manual-mode order.
+     *
+     * POST /v1/orders/{order_id}/transactions requires X-Idempotency-Key and
+     * a request body containing a payments array of Order Payment resources.
      *
      * @param string $order_id Order ID.
-     * @param array<string,mixed> $request Transaction data (payment method, amount, etc.).
-     * @param RequestOptions|null $request_options Per-request configuration overrides.
-     * @return Transactions The created transaction resource.
+     * @param array{payments: array<int, Payment|array<string,mixed>>} $request Payment transactions to add.
+     * @param RequestOptions|null $request_options Per-request configuration overrides, including X-Idempotency-Key.
+     * @return Transactions The 201 response containing mapped payments.
      * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
      * @throws \Exception On transport-level errors.
      */
@@ -49,13 +54,16 @@ final class OrderTransactionClient extends MercadoPagoClient
     }
 
     /**
-     * Updates an existing transaction within an order.
+     * Updates the payment method of a pending manual-order transaction.
+     *
+     * PUT /v1/orders/{order_id}/transactions/{transaction_id} requires
+     * X-Idempotency-Key and a payment_method object.
      *
      * @param string $order_id Order ID.
      * @param string $transaction_id Transaction ID to update.
-     * @param array<string,mixed> $request Fields to update.
-     * @param RequestOptions|null $request_options Per-request configuration overrides.
-     * @return UpdateTransaction The updated transaction resource.
+     * @param array{payment_method: PaymentMethod|array<string,mixed>} $request Payment method update.
+     * @param RequestOptions|null $request_options Per-request configuration overrides, including X-Idempotency-Key.
+     * @return UpdateTransaction The mapped 200 Order transaction payment.
      * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
      * @throws \Exception On transport-level errors.
      */
@@ -69,7 +77,10 @@ final class OrderTransactionClient extends MercadoPagoClient
     }
 
     /**
-     * Deletes a transaction from an order.
+     * Deletes a transaction from a manual-mode order.
+     *
+     * DELETE /v1/orders/{order_id}/transactions/{transaction_id} returns 204
+     * and does not require X-Idempotency-Key.
      *
      * @param string $order_id Order ID.
      * @param string $transaction_id Transaction ID to delete.

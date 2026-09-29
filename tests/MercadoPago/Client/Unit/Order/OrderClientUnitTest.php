@@ -4,9 +4,9 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
+use MercadoPago\Resources\Order;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
 
 /**

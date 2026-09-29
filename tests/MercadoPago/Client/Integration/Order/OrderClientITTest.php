@@ -6,6 +6,9 @@ use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Resources\Order;
+use MercadoPago\Resources\Order\TransactionSecurity;
+use MercadoPago\Serialization\Mapper;
 use PHPUnit\Framework\TestCase;
 use MercadoPago\Client\CardToken\CardTokenClient;
 

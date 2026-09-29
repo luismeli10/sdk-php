@@ -2,11 +2,18 @@
 
 namespace MercadoPago\Tests\Client\Unit\Order;
 
+use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderTransactionClient;
 use MercadoPago\MercadoPagoConfig;
+use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPDefaultHttpClient;
 use MercadoPago\Net\MPHttpClient;
+use MercadoPago\Net\MPRequest;
 use MercadoPago\Net\MPResponse;
+use MercadoPago\Resources\Order\Payment;
+use MercadoPago\Resources\Order\PaymentMethod;
+use MercadoPago\Resources\Order\Transaction\UpdateTransaction;
+use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
 
 /**
@@ -33,12 +40,17 @@ final class OrderTransactionClientUnitTest extends BaseClient
         MercadoPagoConfig::setHttpClient($http_client);
         $client = new OrderTransactionClient();
         $request = $this->createRequest();
+        $request_options = new RequestOptions();
+        $request_options->setCustomHeaders(["X-Idempotency-Key: create-transaction-key"]);
 
-        $transaction = $client->create("01JD26HQ96FFHBD2CHDTXZ9MSH", $request);
+        $transaction = $client->create("01JD26HQ96FFHBD2CHDTXZ9MSH", $request, $request_options);
 
+        $this->assertInstanceOf(Transactions::class, $transaction);
         $this->assertSame(201, $transaction->getResponse()->getStatusCode());
+        $this->assertInstanceOf(Payment::class, $transaction->payments[0]);
         $this->assertSame("pay_01JD26HQ96FFHBD2CHDW984TZM", $transaction->payments[0]->id);
         $this->assertSame("100.00", $transaction->payments[0]->amount);
+        $this->assertInstanceOf(PaymentMethod::class, $transaction->payments[0]->payment_method);
         $this->assertSame("master", $transaction->payments[0]->payment_method->id);
         $this->assertSame("credit_card", $transaction->payments[0]->payment_method->type);
         $this->assertSame(3, $transaction->payments[0]->payment_method->installments);
