@@ -18,11 +18,11 @@ class OrderSearch extends MPResource
     /** Class mapper. */
     use Mapper;
 
-    /** Pagination metadata (offset, limit, total). Maps to {@see \MercadoPago\Resources\Common\Paging}. */
+    /** Pagination metadata containing the OpenAPI total, limit, and offset fields. */
     public array|object|null $paging;
 
-    /** Array of {@see Order} resources matching the search criteria. */
-    public array|object|null $data;
+    /** Ordered list of {@see Order} resources returned in the `data` field. */
+    public ?array $data;
 
     private $map = [
         "paging" => "MercadoPago\Resources\Common\Paging",

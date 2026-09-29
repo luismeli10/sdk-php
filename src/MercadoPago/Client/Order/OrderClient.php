@@ -13,19 +13,20 @@ use MercadoPago\Net\MPSearchRequest;
 use MercadoPago\Serialization\Serializer;
 
 /**
- * Client for the Orders API (`/v1/orders`).
+ * Client for the Orders API lifecycle.
  *
- * Provides full lifecycle management for orders: create, get, capture, cancel,
- * process, refund, and search. Transaction-level operations (add/update/delete
- * individual payments) are handled by the dedicated {@see OrderTransactionClient}.
+ * Implements POST/GET `/v1/orders`, GET `/v1/orders/{id}`, and POST operations
+ * at `/v1/orders/{order_id}/cancel`, `/v1/orders/{order_id}/process`,
+ * `/v1/orders/{order_id}/capture`, and `/v1/orders/{order_id}/refund`.
+ * Mutating operations receive `X-Idempotency-Key` through the existing
+ * {@see RequestOptions} custom-header convention.
  *
  * @see https://www.mercadopago.com/developers/en/reference/order/_v1_orders/post
  */
 final class OrderClient extends MercadoPagoClient
 {
     private const URL = "/v1/orders";
-    private const URL_WITH_ID = "/v1/orders/%s";
-    private const URL_SEARCH = "/v1/orders";
+    private const URL_WITH_ID = self::URL . "/%s";
     private const URL_CAPTURE = self::URL_WITH_ID . '/capture';
     private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
     private const URL_PROCESS = self::URL_WITH_ID . '/process';

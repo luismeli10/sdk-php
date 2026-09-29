@@ -20,14 +20,14 @@ MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
 $client = new OrderClient();
 
 try {
-    // Step 4: Set the Order ID to be fetched
+    // Step 4: Set the Order ID to be fetched from /v1/orders/{id}.
     $order_id = "<ORDER_ID>";
 
-    // Step 5: Create the request options, setting X-Idempotency-Key
+    // Step 5: Create request options when per-request configuration is needed.
+    // X-Idempotency-Key is required for mutating operations, not this GET request.
     $request_options = new RequestOptions();
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Fetch the order by ID
     $order = $client->get($order_id, $request_options);
 
     echo "Order ID: " . $order->id . "\n";
