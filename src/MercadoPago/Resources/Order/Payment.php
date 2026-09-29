@@ -26,10 +26,10 @@ class Payment
     /** Seller-defined reference to correlate this payment with an external system. */
     public ?string $reference_id;
 
-    /** Current payment status (e.g., "approved", "pending", "rejected"). */
+    /** Current transaction status (created, processed, action_required, or processing). */
     public ?string $status;
 
-    /** Granular detail complementing the payment status (e.g., "accredited", "pending_waiting_transfer"). */
+    /** Granular status detail: "accredited", "waiting_capture", "created", "pending_review_manual", or "in_process". */
     public ?string $status_detail;
 
     /** Requested payment amount in the order's currency. */

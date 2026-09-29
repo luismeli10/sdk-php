@@ -10,9 +10,9 @@ use MercadoPago\Serialization\Mapper;
 /**
  * Represents the transaction container for a MercadoPago order.
  *
- * Groups all financial operations associated with an order: payments,
- * refunds, and chargebacks. An order may contain multiple payments
- * (split payment scenarios) and their corresponding reversals.
+ * Groups the payments returned for an order and preserves the SDK's existing
+ * refund and chargeback collections for backward compatibility. Payment
+ * amounts are represented as decimal strings.
  *
  * @see \MercadoPago\Resources\Order
  * @see \MercadoPago\Client\Order\OrderTransactionClient
@@ -22,7 +22,7 @@ class Transactions extends MPResource
     /** Class mapper. */
     use Mapper;
 
-    /** Payments associated with this order. Each element maps to {@see Payment}. */
+    /** Payments associated with this order; automatic-mode requests require at least one. Each element maps to {@see Payment}. */
     public ?array $payments;
 
     /** Refunds processed for this order's payments. Each element maps to {@see Refund}. */

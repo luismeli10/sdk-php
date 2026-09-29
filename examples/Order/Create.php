@@ -78,9 +78,10 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: POST /v1/orders
     $order = $client->create($request, $request_options);
-    echo "Order ID:" . $order->id;
+    echo "Order ID: " . $order->id . "\n";
+    echo "Country code: " . $order->country_code . "\n";
 
     // Step 7: Handle exceptions
 } catch (MPApiException $e) {

@@ -44,7 +44,7 @@ class PaymentMethod
     /** Barcode content string for boleto or lottery-type payments. */
     public ?string $barcode_content;
 
-    /** Payment reference code displayed to the buyer for off-line payments. */
+    /** Payment reference code displayed to the buyer for offline payments. */
     public ?string $reference;
 
     /** External reference identifier for the payment method. */
@@ -68,7 +68,7 @@ class PaymentMethod
     /** End-to-end transaction identifier for Pix payments. */
     public ?string $e2e_id;
 
-    /** URL to redirect the buyer for external payment authorization (e.g., bank redirect). */
+    /** URL to redirect the buyer for external authorization, including PSE and pending 3DS challenges. */
     public ?string $redirect_url;
 
     /** 3D Secure and other transaction security details. Maps to {@see TransactionSecurity}. */

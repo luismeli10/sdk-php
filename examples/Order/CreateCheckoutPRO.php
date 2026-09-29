@@ -140,11 +140,12 @@ try {
     // Step 6: Make the request
     $order = $client->create($request, $request_options);
 
-    // Step 7: Redirect the buyer to the Checkout PRO flow
+    // Step 7: Redirect the buyer to the Checkout Pro URL returned by POST /v1/orders
     echo "Order ID: " . $order->id . "\n";
     echo "Order status: " . $order->status . "\n";
+    echo "Country code: " . $order->country_code . "\n";
     echo "Checkout URL: " . $order->checkout_url . "\n";
-    // Redirect your buyer to $order->checkout_url to complete the payment
+    // Redirect your buyer to $order->checkout_url to complete the payment.
 
     // Step 8: Handle exceptions
 } catch (MPApiException $e) {

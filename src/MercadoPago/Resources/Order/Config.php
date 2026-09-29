@@ -28,7 +28,7 @@ class Config
     /** Payment method restrictions, defaults, and installment settings. Maps to {@see PaymentMethodConfig}. */
     public array|object|null $payment_method;
 
-    /** Online checkout configuration (redirect URLs, security). Maps to {@see OnlineConfig}. */
+    /** Online order configuration, including callback_url and transaction_security. Maps to {@see OnlineConfig}. */
     public array|object|null $online;
 
     private $map = [

@@ -41,7 +41,6 @@ try {
                 ]
             ]
         ],
-        "processing_mode" => "automatic",
         "currency" => "BRL",
         "description" => "some description",
         "payer" => [

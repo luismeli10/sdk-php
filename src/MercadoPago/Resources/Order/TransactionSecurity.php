@@ -23,13 +23,25 @@ class TransactionSecurity
     /** Unique identifier of the 3DS authentication transaction. */
     public ?string $id;
 
-    /** Authentication validation status (e.g., "automatic", "manual"). */
+    /** Requested validation policy: "supported", "required", or "never". */
     public ?string $validation;
+
+    /** 3DS result status: "pending", "success", or "failed". */
+    public ?string $status;
+
+    /** URL to redirect the payer to a pending 3DS challenge. */
+    public ?string $redirect_url;
 
     /** Whether liability shifted to the issuer after 3DS authentication (e.g., "yes", "no"). */
     public ?string $liability_shift;
 
-    /** Challenge URL where the buyer must complete 3DS authentication. */
+    /** Authentication result status (pending, success, or failed). */
+    public ?string $status;
+
+    /** URL where the buyer completes a pending 3DS challenge. */
+    public ?string $redirect_url;
+
+    /** Legacy challenge URL retained for backward compatibility. */
     public ?string $url;
 
     /**

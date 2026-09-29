@@ -25,7 +25,7 @@ class Payer
     /** Legal entity type of the payer (e.g., "individual", "association"). */
     public ?string $entity_type;
 
-    /** Payer's email address used for notifications and receipts. */
+    /** Payer's email address; required when creating an order. */
     public ?string $email;
 
     /** Payer's first name. */

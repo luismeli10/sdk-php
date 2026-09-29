@@ -26,7 +26,7 @@ class OnlineConfig
     /** Restricts who can pay. "account_only" limits to logged-in MercadoPago users; omit to accept all users. */
     public ?string $allowed_user_type;
 
-    /** URL where MercadoPago sends asynchronous payment notifications (IPN/webhook). */
+    /** Redirect URL used after external bank authentication (for example, PSE). */
     public ?string $callback_url;
 
     /** URL to redirect the buyer after a successful payment. */

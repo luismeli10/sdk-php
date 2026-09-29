@@ -5,7 +5,6 @@ namespace Examples\Order;
 // Step 1: Require the library from your Composer vendor folder
 require_once '../../vendor/autoload.php';
 
-use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
 use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
@@ -23,12 +22,8 @@ try {
     // Step 4: Set the Order ID to be fetched
     $order_id = "<ORDER_ID>";
 
-    // Step 5: Create the request options, setting X-Idempotency-Key
-    $request_options = new RequestOptions();
-    $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
-
-    // Step 6: Make the request
-    $order = $client->get($order_id, $request_options);
+    // Step 5: GET /v1/orders/{id} does not require an idempotency header
+    $order = $client->get($order_id);
 
     echo "Order ID: " . $order->id . "\n";
     echo "Total Amount: " . $order->total_amount . "\n";

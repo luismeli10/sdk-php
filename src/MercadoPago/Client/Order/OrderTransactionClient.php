@@ -15,8 +15,9 @@ use MercadoPago\Net\MPResponse;
 /**
  * Client for the Order Transactions API (`/v1/orders/{id}/transactions`).
  *
- * Manages payment transactions within an order, supporting multi-payment
- * scenarios where an order can contain multiple transactions (split payments).
+ * Adds transactions to manual-mode orders, updates pending transaction payment
+ * methods, and removes transactions before processing. POST and PUT operations
+ * require an `X-Idempotency-Key`; DELETE does not require that header.
  */
 final class OrderTransactionClient extends MercadoPagoClient
 {

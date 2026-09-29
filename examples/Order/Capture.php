@@ -56,9 +56,9 @@ try {
     echo "\nOrder status before capture: " . $order->status;
 
     $request_options_capture = new RequestOptions();
-    $request_options_capture->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
+    $request_options_capture->setCustomHeaders(["X-Idempotency-Key: <A_NEW_UNIQUE_VALUE>"]);
 
-    // Step 7: Capture the order
+    // Step 7: POST /v1/orders/{order_id}/capture with a new idempotency key
     $order = $client->capture($order->id, $request_options_capture);
     echo "\nOrder status after capture: " . $order->status;
 

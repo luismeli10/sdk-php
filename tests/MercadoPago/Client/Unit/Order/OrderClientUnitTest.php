@@ -4,7 +4,6 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
@@ -38,6 +37,7 @@ final class OrderClientUnitTest extends BaseClient
         $this->assertSame("credit_card", $order->transactions->payments[0]->payment_method->type);
         $this->assertSame(1, $order->transactions->payments[0]->payment_method->installments);
         $this->assertSame("automatic", $order->processing_mode);
+        $this->assertSame("MLB", $order->country_code);
         $this->assertSame("NONE", $order->marketplace);
     }
 

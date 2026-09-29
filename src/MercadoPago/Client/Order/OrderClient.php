@@ -15,9 +15,11 @@ use MercadoPago\Serialization\Serializer;
 /**
  * Client for the Orders API (`/v1/orders`).
  *
- * Provides full lifecycle management for orders: create, get, capture, cancel,
- * process, refund, and search. Transaction-level operations (add/update/delete
- * individual payments) are handled by the dedicated {@see OrderTransactionClient}.
+ * Supported operations are POST/GET `/v1/orders`, GET `/v1/orders/{id}`, and
+ * POST `/v1/orders/{order_id}/cancel`, `/v1/orders/{order_id}/process`,
+ * `/v1/orders/{order_id}/capture`, and `/v1/orders/{order_id}/refund`.
+ * Mutating operations require an `X-Idempotency-Key` header. Transaction-level
+ * operations are handled by the dedicated {@see OrderTransactionClient}.
  *
  * @see https://www.mercadopago.com/developers/en/reference/order/_v1_orders/post
  */
@@ -25,6 +27,7 @@ final class OrderClient extends MercadoPagoClient
 {
     private const URL = "/v1/orders";
     private const URL_WITH_ID = "/v1/orders/%s";
+    // Order search is GET /v1/orders with begin_date and end_date query filters.
     private const URL_SEARCH = "/v1/orders";
     private const URL_CAPTURE = self::URL_WITH_ID . '/capture';
     private const URL_CANCEL = self::URL_WITH_ID . '/cancel';
@@ -165,12 +168,15 @@ final class OrderClient extends MercadoPagoClient
     /**
      * Searches orders with pagination and filters.
      *
-     * @param MPSearchRequest $request Search criteria (limit, offset, filters like status, external_reference, etc.).
+     * The `begin_date` and `end_date` ISO 8601 filters are required by the API.
+     * Optional filters include `external_reference`, `type`, and `status`.
+     *
+     * @param MPSearchRequest $request Search criteria containing begin_date, end_date, limit, offset, and optional filters.
      * @param RequestOptions|null $request_options Per-request configuration overrides.
      * @return OrderSearch Paginated search results containing matching orders.
      * @throws \MercadoPago\Exceptions\MPApiException When the API returns a non-2xx status code.
      * @throws \Exception On transport-level errors.
-     * @see https://www.mercadopago.com/developers/en/reference/order/_v1_orders_search/get
+     * @see https://www.mercadopago.com/developers/en/reference/order/_v1_orders/get
      */
     public function search(MPSearchRequest $request, ?RequestOptions $request_options = null): OrderSearch
     {

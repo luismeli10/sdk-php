@@ -192,6 +192,46 @@ try{
 }
 ```
 
+## 🌟 Checkout Pro via Orders
+
+Checkout Pro can also be created through the Orders API without changing the Preference-based flow documented below. Build an online order, send a unique `X-Idempotency-Key` to `POST /v1/orders`, and redirect the buyer to the returned `checkout_url`.
+
+```php
+use MercadoPago\Client\Common\RequestOptions;
+use MercadoPago\Client\Order\OrderClient;
+use MercadoPago\MercadoPagoConfig;
+
+MercadoPagoConfig::setAccessToken("<ACCESS_TOKEN>");
+
+$client = new OrderClient();
+$options = new RequestOptions();
+$options->setCustomHeaders(["X-Idempotency-Key: <UNIQUE_VALUE>"]);
+
+$order = $client->create([
+    "type" => "online",
+    "processing_mode" => "manual",
+    "total_amount" => "500.00",
+    "payer" => ["email" => "buyer@example.com"],
+    "items" => [[
+        "title" => "Example item",
+        "quantity" => 1,
+        "unit_price" => "500.00",
+    ]],
+    "config" => [
+        "online" => [
+            "success_url" => "https://example.com/success",
+            "failure_url" => "https://example.com/failure",
+            "pending_url" => "https://example.com/pending",
+            "auto_return" => "approved",
+        ],
+    ],
+], $options);
+
+header("Location: " . $order->checkout_url);
+```
+
+See [`examples/Order/CreateCheckoutPRO.php`](examples/Order/CreateCheckoutPRO.php) for payer, items, shipment, and configuration fields. Order search uses `GET /v1/orders` and requires `begin_date` and `end_date` filters.
+
 ## 🌟 Getting started with payment via Checkout Pro
 
 ### Step 1: Require the libraries

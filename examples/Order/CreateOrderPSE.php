@@ -76,10 +76,11 @@ try {
                 "number" => "<PAYER_DOC_NUMBER>"
             ]
         ],
-        // additional_info uses dot-notation keys in PHP (per the SDK pattern).
-        // payer.ip_address — required by MP's risk engine for PSE.
+        // payer.ip_address is required by the risk engine for PSE.
         "additional_info" => [
-            "payer.ip_address" => "<CLIENT_IP>"
+            "payer" => [
+                "ip_address" => "<CLIENT_IP>"
+            ]
         ],
         // callback_url — where the bank redirects the buyer after authorization.
         "config" => [

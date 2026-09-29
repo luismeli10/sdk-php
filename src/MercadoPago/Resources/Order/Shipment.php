@@ -34,7 +34,7 @@ class Shipment
     /** List of free shipping method IDs available to the buyer. */
     public ?array $free_methods;
 
-    /** Delivery address for the shipment. Maps to Address. */
+    /** Delivery address (zip_code, street_name, street_number, neighborhood, city, state, complement). Maps to Address. */
     public array|object|null $address;
 
     private $map = [
