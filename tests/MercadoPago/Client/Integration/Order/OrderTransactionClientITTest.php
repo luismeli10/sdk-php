@@ -28,8 +28,12 @@ final class OrderTransactionClientITTest extends TestCase
             $client = new OrderTransactionClient();
             $request = $this->createRequest();
 
-            $order = $order_client->create($create_order_request);
-            $transaction = $client->create($order->id, $request);
+            $order_options = new RequestOptions();
+            $order_options->setCustomHeaders(["X-Idempotency-Key: " . bin2hex(random_bytes(16))]);
+            $order = $order_client->create($create_order_request, $order_options);
+            $transaction_options = new RequestOptions();
+            $transaction_options->setCustomHeaders(["X-Idempotency-Key: " . bin2hex(random_bytes(16))]);
+            $transaction = $client->create($order->id, $request, $transaction_options);
 
             $this->assertNotNull($transaction->payments[0]->id);
         } catch (MPApiException $e) {
@@ -83,9 +87,11 @@ final class OrderTransactionClientITTest extends TestCase
                 ]
             ];
 
-            $order = $order_client->create($create_order_request);
+            $request_options = new RequestOptions();
+            $request_options->setCustomHeaders(["X-Idempotency-Key: " . bin2hex(random_bytes(16))]);
+            $order = $order_client->create($create_order_request, $request_options);
             sleep(3);
-            $transaction = $order_transaction_client->update($order->id, $order->transactions->payments[0]->id, $update_transaction_request);
+            $transaction = $order_transaction_client->update($order->id, $order->transactions->payments[0]->id, $update_transaction_request, $request_options);
 
             $this->assertSame("master", $transaction->payment_method->id);
             $this->assertSame("credit_card", $transaction->payment_method->type);

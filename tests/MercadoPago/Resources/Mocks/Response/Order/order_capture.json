@@ -1,6 +1,13 @@
 {
   "id": "01HRYFWNYRE1MR1E60MW3X0T2P",
+  "type": "online",
+  "processing_mode": "automatic",
+  "capture_mode": "manual",
+  "total_amount": "1000.00",
+  "total_paid_amount": "1000.00",
+  "currency": "BRL",
   "status": "processed",
+  "status_detail": "accredited",
   "transactions": {
     "payments": [
       {

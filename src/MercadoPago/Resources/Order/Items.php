@@ -26,8 +26,8 @@ class Items
     /** Display name of the product or service. */
     public ?string $title;
 
-    /** Price per unit in the order's currency. */
-    public ?string $unit_price;
+    /** Price per unit in the order's currency. Strings remain accepted for backwards compatibility. */
+    public float|string|null $unit_price;
 
     /** Number of units of this item being purchased. */
     public ?int $quantity;

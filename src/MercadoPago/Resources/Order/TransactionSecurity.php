@@ -29,7 +29,7 @@ class TransactionSecurity
     /** Whether liability shifted to the issuer after 3DS authentication (e.g., "yes", "no"). */
     public ?string $liability_shift;
 
-    /** Challenge URL where the buyer must complete 3DS authentication. */
+    /** URL where the buyer completes the 3DS authentication challenge. */
     public ?string $url;
 
     /**

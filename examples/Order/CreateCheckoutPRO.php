@@ -20,8 +20,7 @@ MercadoPagoConfig::setRuntimeEnviroment(MercadoPagoConfig::LOCAL);
 $client = new OrderClient();
 
 try {
-    // Step 4: Build the Checkout PRO request
-    // processing_mode "manual" triggers the Checkout PRO flow and returns a checkout_url
+    // Step 4: Build the manual Orders request used by Checkout Pro
     $request = [
         "type" => "online",
         "processing_mode" => "manual",

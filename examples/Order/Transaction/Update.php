@@ -59,7 +59,7 @@ try {
     echo "\nPayment ID: " . $order->transactions->payments[0]->id;
     echo "\nAmount: " . $order->transactions->payments[0]->amount;
 
-    // Step 8: Create the request to update a transaction
+    // Step 8: Create the payload for PUT /v1/orders/{order_id}/transactions/{transaction_id}
     $update_transaction_request = [
         "payment_method" => [
             "installments" => 3,

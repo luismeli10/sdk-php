@@ -21,6 +21,7 @@ $client = new OrderClient();
 
 $order_id = "<ORDER_ID>";
 try {
+    // POST /v1/orders/{order_id}/process
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 

@@ -22,13 +22,13 @@ class Transactions extends MPResource
     /** Class mapper. */
     use Mapper;
 
-    /** Payments associated with this order. Each element maps to {@see Payment}. */
+    /** @var Payment[]|null Payments associated with this order. */
     public ?array $payments;
 
-    /** Refunds processed for this order's payments. Each element maps to {@see Refund}. */
+    /** @var Refund[]|null Refunds processed for this order's payments. */
     public ?array $refunds;
 
-    /** Chargebacks filed against this order's payments. Each element maps to {@see Chargeback}. */
+    /** @var Chargeback[]|null Chargebacks filed against this order's payments. */
     public ?array $chargebacks;
 
     private $map = [

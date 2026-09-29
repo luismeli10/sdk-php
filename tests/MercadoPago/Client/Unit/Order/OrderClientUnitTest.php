@@ -4,7 +4,6 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
@@ -17,14 +16,16 @@ final class OrderClientUnitTest extends BaseClient
     public function testCreateSuccess(): void
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/order.json';
-        $mock_http_request = $this->mockHttpRequest($filepath, 200);
+        $mock_http_request = $this->mockHttpRequest($filepath, 201);
         $http_client = new MPDefaultHttpClient($mock_http_request);
         MercadoPagoConfig::setHttpClient($http_client);
         $client = new OrderClient();
+        $request_options = new RequestOptions();
+        $request_options->setCustomHeaders(["X-Idempotency-Key: create-order-key"]);
 
-        $order = $client->create($this->createRequest());
+        $order = $client->create($this->createRequest(), $request_options);
 
-        $this->assertSame(200, $order->getResponse()->getStatusCode());
+        $this->assertSame(201, $order->getResponse()->getStatusCode());
         $this->assertSame("01HRYFWNYRE1MR1E60MW3X0T2P", $order->id);
         $this->assertSame("online", $order->type);
         $this->assertSame("1000.00", $order->total_amount);

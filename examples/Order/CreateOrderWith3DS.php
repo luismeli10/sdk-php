@@ -62,7 +62,7 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <IDEMPOTENCY_KEY>"]);
 
-    // Step 6: Make the request
+    // Step 6: Create the 3DS order with POST /v1/orders
     $order = $client->create($request, $request_options);
     
     // Step 7: Check if 3DS Challenge is required

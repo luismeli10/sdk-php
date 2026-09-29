@@ -24,6 +24,7 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
+    // POST /v1/orders/{order_id}/cancel
     $order = $client->cancel($order_id, $request_options);
     echo "Order ID: " . $order->id . "\n";
     echo "Status: " . $order->status . "\n";
