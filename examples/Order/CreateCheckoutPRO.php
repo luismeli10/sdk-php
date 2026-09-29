@@ -137,16 +137,22 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Create the order through POST /v1/orders
     $order = $client->create($request, $request_options);
 
-    // Step 7: Redirect the buyer to the Checkout PRO flow
+    // Step 7: Retrieve the mapped Checkout PRO order from GET /v1/orders/{id}
+    $order = $client->get($order->id);
+
+    // Step 8: Redirect the buyer to the Checkout PRO flow
     echo "Order ID: " . $order->id . "\n";
     echo "Order status: " . $order->status . "\n";
+    if ($order->checkout_url === null) {
+        throw new \RuntimeException("The Orders API response did not include a Checkout PRO URL.");
+    }
     echo "Checkout URL: " . $order->checkout_url . "\n";
     // Redirect your buyer to $order->checkout_url to complete the payment
 
-    // Step 8: Handle exceptions
+    // Step 9: Handle exceptions
 } catch (MPApiException $e) {
     echo "Status code: " . $e->getApiResponse()->getStatusCode() . "\n";
     echo "Content: ";

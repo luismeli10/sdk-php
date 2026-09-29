@@ -4,9 +4,16 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderClient;
-use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Net\MPDefaultHttpClient;
+use MercadoPago\Net\MPSearchRequest;
+use MercadoPago\Resources\Order;
+use MercadoPago\Resources\Order\Payer;
+use MercadoPago\Resources\Order\Payment;
+use MercadoPago\Resources\Order\PaymentMethod;
+use MercadoPago\Resources\Order\Refund;
+use MercadoPago\Resources\Order\TransactionSecurity;
+use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
 
 /**
@@ -24,6 +31,12 @@ final class OrderClientUnitTest extends BaseClient
 
         $order = $client->create($this->createRequest());
 
+        $this->assertInstanceOf(Order::class, $order);
+        $this->assertInstanceOf(Payer::class, $order->payer);
+        $this->assertInstanceOf(Transactions::class, $order->transactions);
+        $this->assertInstanceOf(Payment::class, $order->transactions->payments[0]);
+        $this->assertInstanceOf(PaymentMethod::class, $order->transactions->payments[0]->payment_method);
+        $this->assertTrue(class_exists(TransactionSecurity::class));
         $this->assertSame(200, $order->getResponse()->getStatusCode());
         $this->assertSame("01HRYFWNYRE1MR1E60MW3X0T2P", $order->id);
         $this->assertSame("online", $order->type);
@@ -151,6 +164,7 @@ final class OrderClientUnitTest extends BaseClient
         $this->assertSame($order_id, $order->id);
         $this->assertSame("refunded", $order->status);
         $this->assertSame("refunded", $order->status_detail);
+        $this->assertInstanceOf(Refund::class, $order->transactions->refunds[0]);
         $this->assertSame("ref_01JDWHPXYC42ESJ40V4D3SMHW1", $order->transactions->refunds[0]->id);
         $this->assertSame("pay_01JDWHNG2GR2WHGBMRFY7HP5ZB", $order->transactions->refunds[0]->transaction_id);
         $this->assertSame("01JDWHPX7WMAVAQG5546553QDW", $order->transactions->refunds[0]->reference_id);
@@ -698,21 +712,46 @@ final class OrderClientUnitTest extends BaseClient
 
     public function testSearchSuccess(): void
     {
-        $filepath = '../../../../Resources/Mocks/Response/Order/order_search.json';
-        $mock_http_request = $this->mockHttpRequest($filepath, 200);
-
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $captured_options = [];
+        $mock_http_request = $this->getMockBuilder(\MercadoPago\Net\HttpRequest::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock_http_request->expects($this->once())
+            ->method('setOptionArray')
+            ->with($this->callback(function (array $options) use (&$captured_options): bool {
+                $captured_options = $options;
+                return true;
+            }));
+        $mock_http_request->method('execute')->willReturn(file_get_contents(
+            __DIR__ . '../../../../Resources/Mocks/Response/Order/order_search.json'
+        ));
+        $mock_http_request->method('getInfo')->willReturnCallback(
+            fn ($option) => $option === CURLINFO_HTTP_CODE ? 200 : null
+        );
+        $mock_http_request->method('close');
+        MercadoPagoConfig::setHttpClient(new MPDefaultHttpClient($mock_http_request));
 
         $client = new OrderClient();
-        $search_request = new \MercadoPago\Net\MPSearchRequest(5, 0, []);
+        $search_request = new MPSearchRequest(5, 0, [
+            'begin_date' => '2025-01-01T00:00:00.000-00:00',
+            'end_date' => '2025-01-31T23:59:59.999-00:00',
+        ]);
         $search_result = $client->search($search_request);
+
+        $query = [];
+        parse_str((string) parse_url($captured_options[CURLOPT_URL], PHP_URL_QUERY), $query);
+        $this->assertSame('/v1/orders', parse_url($captured_options[CURLOPT_URL], PHP_URL_PATH));
+        $this->assertSame('GET', $captured_options[CURLOPT_CUSTOMREQUEST]);
+        $this->assertSame('2025-01-01T00:00:00.000-00:00', $query['begin_date']);
+        $this->assertSame('2025-01-31T23:59:59.999-00:00', $query['end_date']);
+        $this->assertSame('5', $query['limit']);
+        $this->assertSame('0', $query['offset']);
         $this->assertSame(200, $search_result->getResponse()->getStatusCode());
         $this->assertSame(10, $search_result->paging->total);
         $this->assertSame(2, $search_result->paging->total_pages);
         $this->assertSame(5, $search_result->paging->limit);
         $this->assertSame(0, $search_result->paging->offset);
-        $this->assertSame(1, count($search_result->data));
+        $this->assertCount(1, $search_result->data);
         $this->assertSame("01JD2P9GGXAPBDGG6YT90N77M3", $search_result->data[0]->id);
     }
 }

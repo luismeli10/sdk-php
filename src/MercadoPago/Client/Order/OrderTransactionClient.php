@@ -13,15 +13,15 @@ use MercadoPago\Serialization\Serializer;
 use MercadoPago\Net\MPResponse;
 
 /**
- * Client for the Order Transactions API (`/v1/orders/{id}/transactions`).
+ * Client for the Order Transactions API (`/v1/orders/{order_id}/transactions`).
  *
- * Manages payment transactions within an order, supporting multi-payment
- * scenarios where an order can contain multiple transactions (split payments).
+ * Creates payment transactions, updates their payment method, and deletes
+ * unprocessed transactions from manual-mode orders.
  */
 final class OrderTransactionClient extends MercadoPagoClient
 {
-    private const URL = "/v1/orders/%s/transactions";
-    private const URL_WITH_ID = self::URL . "/%s";
+    private const URL = "/v1/orders/{order_id}/transactions";
+    private const URL_WITH_ID = "/v1/orders/{order_id}/transactions/{transaction_id}";
 
     /** @param MPHttpClient|null $MPHttpClient Custom HTTP client. Defaults to the SDK global client. */
     public function __construct(?MPHttpClient $MPHttpClient = null)
@@ -41,7 +41,7 @@ final class OrderTransactionClient extends MercadoPagoClient
      */
     public function create(string $order_id, array $request, ?RequestOptions $request_options = null): Transactions
     {
-        $path = sprintf(self::URL, rawurlencode($order_id));
+        $path = str_replace('{order_id}', rawurlencode($order_id), self::URL);
         $response = parent::send($path, HttpMethod::POST, json_encode($request), null, $request_options);
         $result = Serializer::deserializeFromJson(Transactions::class, $response->getContent());
         $result->setResponse($response);
@@ -61,7 +61,11 @@ final class OrderTransactionClient extends MercadoPagoClient
      */
     public function update(string $order_id, string $transaction_id, array $request, ?RequestOptions $request_options = null): UpdateTransaction
     {
-        $path = sprintf(self::URL_WITH_ID, rawurlencode($order_id), rawurlencode($transaction_id));
+        $path = str_replace(
+            ['{order_id}', '{transaction_id}'],
+            [rawurlencode($order_id), rawurlencode($transaction_id)],
+            self::URL_WITH_ID
+        );
         $response = parent::send($path, HttpMethod::PUT, json_encode($request), null, $request_options);
         $result = Serializer::deserializeFromJson(UpdateTransaction::class, $response->getContent());
         $result->setResponse($response);
@@ -80,7 +84,11 @@ final class OrderTransactionClient extends MercadoPagoClient
      */
     public function delete(string $order_id, string $transaction_id, ?RequestOptions $request_options = null): MPResponse
     {
-        $path = sprintf(self::URL_WITH_ID, rawurlencode($order_id), rawurlencode($transaction_id));
+        $path = str_replace(
+            ['{order_id}', '{transaction_id}'],
+            [rawurlencode($order_id), rawurlencode($transaction_id)],
+            self::URL_WITH_ID
+        );
         return parent::send($path, HttpMethod::DELETE, null, null, $request_options);
     }
 }
