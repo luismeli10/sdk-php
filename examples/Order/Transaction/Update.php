@@ -70,7 +70,7 @@ try {
     $update_transaction_request_options = new RequestOptions();
     $update_transaction_request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 10: Update the transaction
+    // Step 10: Update the transaction at /v1/orders/{order_id}/transactions/{transaction_id}
     sleep(3);
     $transaction = $order_transaction_client->update($order->id, $order->transactions->payments[0]->id, $update_transaction_request, $update_transaction_request_options);
 

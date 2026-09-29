@@ -30,20 +30,20 @@ class Order extends MPResource
     /** Seller-defined reference to correlate the order with an external system. */
     public ?string $external_reference;
 
-    /** ISO 3166-1 alpha-2 country code where the order is processed. */
+    /** MercadoPago site code for the order (e.g., "MLB" or "MLA"). */
     public ?string $country_code;
 
-    /** Current high-level status of the order (e.g., "opened", "closed", "expired"). */
+    /** Current lifecycle status (created, processed, action_required, processing, or canceled). */
     public ?string $status;
 
     /** Granular detail complementing the order status. */
     public ?string $status_detail;
 
-    /** Determines how funds are captured (e.g., "automatic" or "manual"). */
+    /** Determines how funds are captured (automatic, manual, or automatic_async). */
     public ?string $capture_mode;
 
     /** MercadoPago user ID of the seller who owns the order. */
-    public ?string $user_id;
+    public ?int $user_id;
 
     /** URL to redirect the buyer to the Checkout PRO payment flow. Generated automatically on order creation. */
     public ?string $checkout_url;
@@ -57,7 +57,7 @@ class Order extends MPResource
     /** Total amount effectively paid by the buyer. */
     public ?string $total_paid_amount;
 
-    /** Processing mode for payments (e.g., "aggregator", "gateway"). */
+    /** Order lifecycle processing mode: "automatic" or "manual". */
     public ?string $processing_mode;
 
     /** Short description of the order shown to the buyer. */

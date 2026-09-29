@@ -13,10 +13,22 @@ use MercadoPago\Serialization\Serializer;
 use MercadoPago\Net\MPResponse;
 
 /**
- * Client for the Order Transactions API (`/v1/orders/{id}/transactions`).
+ * Client for the three manual-mode Order transaction operations.
  *
- * Manages payment transactions within an order, supporting multi-payment
- * scenarios where an order can contain multiple transactions (split payments).
+ * Uses `POST /v1/orders/{order_id}/transactions` to add `payments`, and
+ * `PUT` or `DELETE /v1/orders/{order_id}/transactions/{transaction_id}` to
+ * update or remove a transaction before the order is processed. POST and PUT
+ * require `X-Idempotency-Key` through {@see RequestOptions} custom headers.
+ *
+ * Successful responses are 201 for create, 200 for update, and 204 with an
+ * empty body for delete. The API documents 400/401/404 errors for all three
+ * operations and an additional 422 error for create.
+ *
+ * @see \MercadoPago\Resources\Order\Transactions
+ * @see \MercadoPago\Resources\Order\Payment
+ * @see \MercadoPago\Resources\Order\PaymentMethod
+ * @see \MercadoPago\Resources\Order\Transaction\UpdateTransaction
+ * @see \MercadoPago\Resources\Order\TransactionSecurity
  */
 final class OrderTransactionClient extends MercadoPagoClient
 {

@@ -140,11 +140,16 @@ try {
     // Step 6: Make the request
     $order = $client->create($request, $request_options);
 
-    // Step 7: Redirect the buyer to the Checkout PRO flow
+    // Step 7: Read the Order response and redirect the buyer to Checkout PRO
     echo "Order ID: " . $order->id . "\n";
     echo "Order status: " . $order->status . "\n";
+    echo "Site code: " . $order->country_code . "\n";
+    echo "Total amount: " . $order->total_amount . "\n";
+    echo "Total paid amount: " . $order->total_paid_amount . "\n";
     echo "Checkout URL: " . $order->checkout_url . "\n";
-    // Redirect your buyer to $order->checkout_url to complete the payment
+
+    // The response can also contain client_token and additional_info. Treat the token as sensitive.
+    // Redirect your buyer to $order->checkout_url to complete the payment.
 
     // Step 8: Handle exceptions
 } catch (MPApiException $e) {

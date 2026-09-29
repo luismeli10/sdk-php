@@ -426,10 +426,13 @@ final class OrderClientUnitTest extends BaseClient
         $this->assertSame("manual", $order->processing_mode);
         $this->assertSame("created", $order->status);
         $this->assertSame("500.00", $order->total_amount);
+        $this->assertSame("0.00", $order->total_paid_amount);
+        $this->assertSame("MLB", $order->country_code);
         $this->assertSame("ext_ref_checkout_pro_001", $order->external_reference);
         // checkout_url is the key field for Checkout PRO — redirect the buyer here
         $this->assertNotNull($order->checkout_url);
         $this->assertStringContainsString("ORDTST01KS5AJ6HTK2HRQ3XJ3C2JCKP9", $order->checkout_url);
+        $this->assertSame("8772548647196351", $order->integration_data->application_id);
         // payer
         $this->assertSame("buyer@testuser.com", $order->payer->email);
         $this->assertSame("CPF", $order->payer->identification->type);
