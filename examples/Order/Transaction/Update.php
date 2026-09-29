@@ -72,7 +72,13 @@ try {
 
     // Step 10: Update the transaction
     sleep(3);
-    $transaction = $order_transaction_client->update($order->id, $order->transactions->payments[0]->id, $update_transaction_request, $update_transaction_request_options);
+    $transaction_id = $order->transactions->payments[0]->id;
+    $transaction = $order_transaction_client->update(
+        $order->id,
+        $transaction_id,
+        $update_transaction_request,
+        $update_transaction_request_options
+    );
 
     echo "\n===== AFTER UPDATE =====";
     echo "\nTransaction installments updated: \n";

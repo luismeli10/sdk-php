@@ -22,7 +22,7 @@ class OrderSearch extends MPResource
     public array|object|null $paging;
 
     /** Array of {@see Order} resources matching the search criteria. */
-    public array|object|null $data;
+    public ?array $data;
 
     private $map = [
         "paging" => "MercadoPago\Resources\Common\Paging",

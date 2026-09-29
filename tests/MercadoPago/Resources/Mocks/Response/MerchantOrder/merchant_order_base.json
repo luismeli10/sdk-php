@@ -6,6 +6,7 @@
   "payments": [],
   "shipments": [],
   "payouts": [],
+  "preference": null,
   "collector": {
       "id": 123456789,
       "email": "",

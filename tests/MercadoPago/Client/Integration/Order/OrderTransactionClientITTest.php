@@ -10,7 +10,6 @@ use MercadoPago\Exceptions\MPApiException;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Resources\Order\Payment;
 use MercadoPago\Resources\Order\PaymentMethod;
-use MercadoPago\Resources\Order\Transaction\UpdateTransaction;
 use MercadoPago\Resources\Order\Transactions;
 use PHPUnit\Framework\TestCase;
 
@@ -32,9 +31,9 @@ final class OrderTransactionClientITTest extends TestCase
             $client = new OrderTransactionClient();
             $request = $this->createRequest();
 
-            $order = $order_client->create($create_order_request);
             $request_options = new RequestOptions();
             $request_options->setCustomHeaders(["X-Idempotency-Key: " . uniqid("add-transaction-", true)]);
+            $order = $order_client->create($create_order_request, $request_options);
             $transaction = $client->create($order->id, $request, $request_options);
 
             $this->assertInstanceOf(Transactions::class, $transaction);
@@ -92,10 +91,10 @@ final class OrderTransactionClientITTest extends TestCase
                 ]
             ];
 
-            $order = $order_client->create($create_order_request);
-            sleep(3);
             $request_options = new RequestOptions();
             $request_options->setCustomHeaders(["X-Idempotency-Key: " . uniqid("update-transaction-", true)]);
+            $order = $order_client->create($create_order_request, $request_options);
+            sleep(3);
             $transaction = $order_transaction_client->update(
                 $order->id,
                 $order->transactions->payments[0]->id,
@@ -103,7 +102,10 @@ final class OrderTransactionClientITTest extends TestCase
                 $request_options
             );
 
-            $this->assertInstanceOf(UpdateTransaction::class, $transaction);
+            $this->assertInstanceOf(
+                \MercadoPago\Resources\Order\Transaction\UpdateTransaction::class,
+                $transaction
+            );
             $this->assertInstanceOf(PaymentMethod::class, $transaction->payment_method);
             $this->assertSame("master", $transaction->payment_method->id);
             $this->assertSame("credit_card", $transaction->payment_method->type);

@@ -5,12 +5,10 @@ namespace MercadoPago\Client\Order;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\MercadoPagoClient;
 use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPHttpClient;
 use MercadoPago\Net\MPResponse;
 use MercadoPago\Resources\Order\Payment;
 use MercadoPago\Resources\Order\PaymentMethod;
-use MercadoPago\Resources\Order\Transaction\UpdateTransaction;
 use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Serialization\Serializer;
 
@@ -47,7 +45,13 @@ final class OrderTransactionClient extends MercadoPagoClient
     public function create(string $order_id, array $request, ?RequestOptions $request_options = null): Transactions
     {
         $path = sprintf(self::URL, rawurlencode($order_id));
-        $response = parent::send($path, HttpMethod::POST, json_encode($request), null, $request_options);
+        $response = parent::send(
+            $path,
+            \MercadoPago\Net\HttpMethod::POST,
+            json_encode($request),
+            null,
+            $request_options
+        );
         $result = Serializer::deserializeFromJson(Transactions::class, $response->getContent());
         $result->setResponse($response);
         return $result;
@@ -71,7 +75,7 @@ final class OrderTransactionClient extends MercadoPagoClient
     {
         $path = sprintf(self::URL_WITH_ID, rawurlencode($order_id), rawurlencode($transaction_id));
         $response = parent::send($path, HttpMethod::PUT, json_encode($request), null, $request_options);
-        $result = Serializer::deserializeFromJson(UpdateTransaction::class, $response->getContent());
+        $result = Serializer::deserializeFromJson(\MercadoPago\Resources\Order\Transaction\UpdateTransaction::class, $response->getContent());
         $result->setResponse($response);
         return $result;
     }

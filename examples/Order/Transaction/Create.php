@@ -41,7 +41,7 @@ try {
     $request_options = new RequestOptions();
     $request_options->setCustomHeaders(["X-Idempotency-Key: <SOME_UNIQUE_VALUE>"]);
 
-    // Step 6: Make the request
+    // Step 6: Make the request through the transaction client contract
     $transaction = $client->create("<ORDER_ID>", $request, $request_options);
     echo "Payment ID: " . $transaction->payments[0]->id;
     echo "\nPayment method ID: " . $transaction->payments[0]->payment_method->id;

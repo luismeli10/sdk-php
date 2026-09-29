@@ -31,8 +31,11 @@ class IntegrationData
     /** E-commerce platform identifier (e.g., for WooCommerce, Magento, etc.). */
     public ?string $platform_id;
 
+    /** Sponsor identifier when the integration creates the order on behalf of another account. */
+    public ?string $sponsor_id;
+
     /** Sponsor details when the order is created on behalf of another account. Maps to {@see Sponsor}. */
-    public array|object|null $sponsor;
+    public Sponsor|array|null $sponsor;
 
     private $map = [
         "sponsor" => "MercadoPago\Resources\Order\Sponsor",

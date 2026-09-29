@@ -5,14 +5,11 @@ namespace MercadoPago\Tests\Client\Unit\Order;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Order\OrderTransactionClient;
 use MercadoPago\MercadoPagoConfig;
-use MercadoPago\Net\HttpMethod;
 use MercadoPago\Net\MPDefaultHttpClient;
 use MercadoPago\Net\MPHttpClient;
-use MercadoPago\Net\MPRequest;
 use MercadoPago\Net\MPResponse;
 use MercadoPago\Resources\Order\Payment;
 use MercadoPago\Resources\Order\PaymentMethod;
-use MercadoPago\Resources\Order\Transaction\UpdateTransaction;
 use MercadoPago\Resources\Order\Transactions;
 use MercadoPago\Tests\Client\Unit\Base\BaseClient;
 
@@ -21,23 +18,23 @@ use MercadoPago\Tests\Client\Unit\Base\BaseClient;
  */
 final class OrderTransactionClientUnitTest extends BaseClient
 {
-    private $http_client_mock;
+    private $MPHttpClient_mock;
     private $client;
 
     protected function setUp(): void
     {
-        /** @var MPHttpClient|\PHPUnit\Framework\MockObject\MockObject $http_client_mock */
-        $this->http_client_mock = $this->createMock(MPHttpClient::class);
+        /** @var MPHttpClient|\PHPUnit\Framework\MockObject\MockObject $MPHttpClient_mock */
+        $this->MPHttpClient_mock = $this->createMock(MPHttpClient::class);
 
-        $this->client = new OrderTransactionClient($this->http_client_mock);
+        $this->client = new OrderTransactionClient($this->MPHttpClient_mock);
     }
 
     public function testCreateSuccess(): void
     {
         $filepath = '../../../../Resources/Mocks/Response/Order/transaction.json';
         $mock_http_request = $this->mockHttpRequest($filepath, 201);
-        $http_client = new MPDefaultHttpClient($mock_http_request);
-        MercadoPagoConfig::setHttpClient($http_client);
+        $MPHttpClient = new MPDefaultHttpClient($mock_http_request);
+        MercadoPagoConfig::setHttpClient($MPHttpClient);
         $client = new OrderTransactionClient();
         $request = $this->createRequest();
         $request_options = new RequestOptions();

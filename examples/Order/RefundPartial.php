@@ -51,11 +51,12 @@ try {
     // Step 6: Create the Order
     $order = $order_client->create($create_order_request, $request_options);
 
-    // Step 7: Create the request to refund Order partially
+    // Step 7: Create the request to refund one transaction partially
+    $transaction_id = $order->transactions->payments[0]->id;
     $refund_request = [
         "transactions" => [
             [
-                "id" => $order->transactions->payments[0]->id,
+                "id" => $transaction_id,
                 "amount" => "25.00",
             ],
         ],

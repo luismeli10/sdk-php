@@ -4,6 +4,7 @@
 
 namespace MercadoPago\Resources\Order;
 
+use MercadoPago\Net\MPResource;
 use MercadoPago\Serialization\Mapper;
 
 /**
@@ -15,7 +16,7 @@ use MercadoPago\Serialization\Mapper;
  * @see \MercadoPago\Resources\Order\Transactions
  * @see \MercadoPago\Client\Order\OrderTransactionClient
  */
-class Payment
+class Payment extends MPResource
 {
     /** Class mapper. */
     use Mapper;
@@ -51,7 +52,7 @@ class Payment
     public ?array $attempts;
 
     /** Payment method used for this payment (card, Pix, boleto, etc.). Maps to {@see PaymentMethod}. */
-    public array|object|null $payment_method;
+    public PaymentMethod|array|null $payment_method;
 
     /** Automatic/recurring payment configuration. Maps to {@see AutomaticPayments}. */
     public array|object|null $automatic_payments;

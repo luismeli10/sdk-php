@@ -40,7 +40,7 @@ Here you can check eg. data structures for each parameter used by the SDK for ea
 
 ## 🌟 Getting started with Checkout Pro via Orders
 
-The Orders client creates and manages Checkout Pro orders through `/v1/orders`. It maps individual responses to `MercadoPago\Resources\Order` and search responses to `MercadoPago\Resources\OrderSearch`.
+The Orders client creates and manages Checkout Pro orders through `/v1/orders`. `MercadoPago\Client\Order\OrderClient::__construct(?MPHttpClient $MPHttpClient = null)` accepts an optional `MercadoPago\Net\MPHttpClient`; the `$MPHttpClient` name is part of the public contract for PHP 8 named arguments. Likewise, `MercadoPago\Client\Order\OrderClient::get(string $order_id, ...)` preserves the `$order_id` parameter name and URL-encodes it with `rawurlencode($order_id)`. Individual responses map to `MercadoPago\Resources\Order`, while search responses map to `MercadoPago\Resources\OrderSearch`. Transaction updates are handled by `MercadoPago\Client\Order\OrderTransactionClient::update`, not by `OrderClient`.
 
 ### Create an order
 
@@ -62,6 +62,12 @@ $request = [
     "total_amount" => "1000.00",
     "external_reference" => "ext_ref_1234",
     "capture_mode" => "automatic_async",
+    "config" => [
+        "online" => [
+            // An empty JSON object disables additional transaction security requirements.
+            "transaction_security" => json_decode("{}"),
+        ],
+    ],
     "payer" => [
         "email" => "<PAYER_EMAIL>",
     ],
@@ -75,9 +81,6 @@ $request = [
                     "token" => "<CARD_TOKEN>",
                     "installments" => 1,
                     "statement_descriptor" => "Store name",
-                    "transaction_security" => [
-                        "type" => "none",
-                    ],
                 ],
             ],
         ],
@@ -100,7 +103,7 @@ try {
 }
 ```
 
-The payment collection is available as `transactions.payments`; each payment's security settings are mapped from `transactions.payments[].payment_method.transaction_security`.
+The payment collection is available as `transactions.payments`; transaction security settings belong to `config.online.transaction_security`.
 
 ### Retrieve and search orders
 
@@ -131,10 +134,10 @@ $cancelled = $client->cancel("<ORDER_ID>", $request_options); // POST /v1/orders
 $processed = $client->process("<ORDER_ID>", $request_options); // POST /v1/orders/{order_id}/process
 $captured = $client->capture("<ORDER_ID>", $request_options); // POST /v1/orders/{order_id}/capture
 $refunded = $client->refund("<ORDER_ID>", null, $request_options); // POST /v1/orders/{order_id}/refund
-$partially_refunded = $client->refund("<ORDER_ID>", ["amount" => "25.00"], $request_options);
+$partially_refunded = $client->refund("<ORDER_ID>", ["transactions" => [["id" => "<TRANSACTION_ID>", "amount" => "25.00"]]], $request_options);
 ```
 
-## 🌟 Getting started with payment via Checkout Pro
+## 🌟 Legacy Checkout Pro via Preferences
 
 ### Step 1: Require the libraries
 

@@ -20,9 +20,9 @@ final class OrderClient extends MercadoPagoClient
 {
     private const ORDERS_PATH = "/v1/orders";
 
-    public function __construct(?MPHttpClient $http_client = null)
+    public function __construct(?MPHttpClient $MPHttpClient = null)
     {
-        parent::__construct($http_client ?? MercadoPagoConfig::getHttpClient());
+        parent::__construct($MPHttpClient ?? MercadoPagoConfig::getHttpClient());
     }
 
     /**
@@ -52,10 +52,10 @@ final class OrderClient extends MercadoPagoClient
      * @throws MPApiException
      * @throws \Exception
      */
-    public function get(string $id, ?RequestOptions $request_options = null): Order
+    public function get(string $order_id, ?RequestOptions $request_options = null): Order
     {
         $response = $this->send(
-            self::ORDERS_PATH . "/" . $id,
+            self::ORDERS_PATH . "/" . rawurlencode($order_id),
             HttpMethod::GET,
             null,
             null,
@@ -117,31 +117,6 @@ final class OrderClient extends MercadoPagoClient
         return $this->executeAction($order_id, "refund", $request_options, $request);
     }
 
-    /**
-     * Updates a transaction associated with an order.
-     *
-     * @throws MPApiException
-     * @throws \Exception
-     */
-    public function updateTransaction(
-        string $order_id,
-        string $transaction_id,
-        array $request,
-        ?RequestOptions $request_options = null
-    ): Order
-    {
-        $response = $this->send(
-            self::ORDERS_PATH . "/" . $order_id . "/transactions/" . $transaction_id,
-            HttpMethod::PUT,
-            json_encode($request),
-            request_options: $request_options
-        );
-
-        $result = Serializer::deserializeFromJson(Order::class, $response->getContent());
-        $result->setResponse($response);
-        return $result;
-    }
-
     private function executeAction(
         string $order_id,
         string $action,
@@ -150,7 +125,7 @@ final class OrderClient extends MercadoPagoClient
     ): Order
     {
         $response = $this->send(
-            self::ORDERS_PATH . "/" . $order_id . "/" . $action,
+            self::ORDERS_PATH . "/" . rawurlencode($order_id) . "/" . $action,
             HttpMethod::POST,
             $request === null ? null : json_encode($request),
             request_options: $request_options
